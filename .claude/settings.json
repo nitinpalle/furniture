@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const m = require\\('pdf-parse'\\); const p = new m.PDFParse\\({ data: Buffer.alloc\\(10\\) }\\); console.log\\(Object.getOwnPropertyNames\\(Object.getPrototypeOf\\(p\\)\\).join\\('\\\\n'\\)\\);\")",
+      "Bash(node -e ' *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\nitin\\Downloads\\Furniture\\.husky"
+    ]
+  }
+}

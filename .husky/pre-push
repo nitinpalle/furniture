@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# Get current branch name
+branch=$(git branch --show-current)
+
+# Block direct push to main
+if [ "$branch" = "main" ]; then
+  echo ""
+  echo "🚫 Direct push to main blocked!"
+  echo ""
+  echo "Please use the feature branch workflow:"
+  echo "  1. git checkout -b feat/your-feature"
+  echo "  2. Make changes and commit"
+  echo "  3. git push -u origin feat/your-feature"
+  echo "  4. Create PR: gh pr create"
+  echo ""
+  echo "Or if you REALLY need to push to main (emergency):"
+  echo "  git push --no-verify"
+  echo ""
+  exit 1
+fi
+
+echo ""
+echo "✅ Pushing to branch: $branch"
+echo ""
+
+# Run TypeScript type check
+if [ -f "tsconfig.json" ]; then
+  echo "🔍 Running TypeScript type check..."
+  npx tsc --noEmit
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ TypeScript errors found. Fix them before pushing."
+    echo ""
+    echo "To skip this check (emergency only):"
+    echo "  git push --no-verify"
+    echo ""
+    exit 1
+  fi
+  echo "✅ TypeScript check passed"
+  echo ""
+fi
+
+# Run ESLint
+if [ -f "eslint.config.mjs" ] || [ -f ".eslintrc.json" ] || [ -f ".eslintrc.js" ]; then
+  echo "🔍 Running ESLint..."
+  npx eslint . --max-warnings 0
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ ESLint errors/warnings found. Fix them before pushing."
+    echo ""
+    echo "To skip this check (emergency only):"
+    echo "  git push --no-verify"
+    echo ""
+    exit 1
+  fi
+  echo "✅ ESLint check passed"
+  echo ""
+fi
+
+echo "✅ All pre-push checks passed!"
+echo ""
