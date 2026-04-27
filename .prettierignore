@@ -1,0 +1,12 @@
+.next
+node_modules
+extracted
+build
+dist
+out
+public
+package-lock.json
+*.lock
+*.log
+.env*
+PRD.md
