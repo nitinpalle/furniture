@@ -66,8 +66,9 @@ next-env.d.ts
 # Inspection/scratch scripts
 inspect-pdf.cjs
 
-# Supabase generated types
-/lib/database.types.ts
+# Supabase generated types — committed as a placeholder until Supabase CLI is wired up.
+# Once `npm run db:types` runs against the live project, this file is auto-overwritten.
+# Do NOT gitignore until the regen flow is reliable for everyone on the team.
 
 # OS
 ehthumbs.db
