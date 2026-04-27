@@ -1,0 +1,10 @@
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+/**
+ * Merges Tailwind classes with clsx + tailwind-merge.
+ * Always use this when conditionally combining classes.
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
