@@ -76,6 +76,9 @@ ehthumbs.db
 # Claude project-local config (user-specific)
 .claude/settings.local.json
 
+# Supabase CLI temp / link state
+/supabase/.temp/
+
 # Local-only Skills folder (user adds skills here, not part of repo)
 /Skills
 
