@@ -10,6 +10,8 @@ import { InquiryCard } from "@/components/product/InquiryCard";
 import { SpecsList } from "@/components/product/SpecsList";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
 import { StickyMobileBar } from "@/components/product/StickyMobileBar";
+import { ExpandableSection } from "@/components/product/ExpandableSection";
+import { QuickActions } from "@/components/product/QuickActions";
 
 type Params = Promise<{ slug: string }>;
 
@@ -60,8 +62,6 @@ export default async function ProductPage({ params }: { params: Params }) {
     series: product.series?.name ?? null,
   };
 
-  // Above-the-gallery summary kept minimal — title + dims + country only.
-  // Capacity, SKU, material, etc. live in the SpecsList below the gallery.
   const flag = flagFor(product.country_of_origin);
   const summaryBits = [
     product.dimensions,
@@ -69,6 +69,11 @@ export default async function ProductPage({ params }: { params: Params }) {
       ? `${flag ? flag + " " : ""}Made in ${product.country_of_origin}`
       : null,
   ].filter(Boolean) as string[];
+
+  const leadTimeStr =
+    product.lead_time_days != null
+      ? `${product.lead_time_days}–${product.lead_time_days + 15} days`
+      : null;
 
   return (
     <>
@@ -122,9 +127,14 @@ export default async function ProductPage({ params }: { params: Params }) {
         </ol>
       </nav>
 
-      {/* ============== TITLE ROW (above gallery, Airbnb-style) ============== */}
-      {/* Minimal: title + summary (dimensions · country of origin only). */}
+      {/* ============== TITLE ROW (above gallery) ============== */}
       <header className="mx-auto max-w-7xl px-4 pt-3 lg:px-8 lg:pt-5">
+        {/* Collection eyebrow — Halden style on mobile, hidden on desktop (subcategory shows below the layout structure) */}
+        {product.series?.name && (
+          <p className="text-[var(--color-fg-subtle)] mb-1.5 text-[11px] font-semibold uppercase tracking-widest lg:hidden">
+            {product.series.name}
+          </p>
+        )}
         <h1 className="font-[var(--font-display)] text-balance text-2xl font-medium tracking-tight md:text-3xl lg:text-4xl">
           {product.name}
         </h1>
@@ -135,22 +145,50 @@ export default async function ProductPage({ params }: { params: Params }) {
         )}
       </header>
 
-      {/* ============== TOP HERO GALLERY (height-capped) ============== */}
-      <section className="mx-auto mt-4 max-w-7xl px-4 lg:px-8 lg:mt-5">
-        <ProductGallery
-          images={product.image_urls ?? []}
-          alt={product.name}
-        />
+      {/* ============== GALLERY ============== */}
+      <section className="mx-auto mt-4 max-w-7xl lg:mt-5 lg:px-8">
+        {/* Mobile gallery is edge-to-edge for that Airbnb / Halden hero feel */}
+        <div className="lg:px-0 px-0 lg:[&>div]:px-0">
+          <ProductGallery
+            images={product.image_urls ?? []}
+            alt={product.name}
+          />
+        </div>
+      </section>
+
+      {/* ============== MOBILE: origin + lead time row ============== */}
+      {(product.country_of_origin || leadTimeStr) && (
+        <section className="mx-auto mt-4 max-w-7xl px-4 lg:hidden">
+          <div className="text-[var(--color-fg-muted)] flex items-center gap-2 text-xs">
+            {flag && <span aria-hidden>{flag}</span>}
+            {product.country_of_origin && (
+              <span>Made in {product.country_of_origin}</span>
+            )}
+            {leadTimeStr && (
+              <>
+                <span className="text-[var(--color-fg-subtle)]" aria-hidden>·</span>
+                <span className="font-mono text-[11px] uppercase tracking-wide">
+                  Lead {leadTimeStr}
+                </span>
+              </>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ============== MOBILE: quick actions ============== */}
+      <section className="mx-auto mt-4 max-w-7xl px-4 lg:hidden">
+        <QuickActions productName={product.name} />
       </section>
 
       {/* ============== TWO-COLUMN: details (60%) + sticky inquiry card (40%) ============== */}
       <section className="mx-auto max-w-7xl px-4 pb-20 pt-8 lg:px-8 lg:pb-16 lg:pt-10">
         <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:gap-12 xl:gap-16">
-          {/* LEFT — description, project chips, specs */}
-          <div className="space-y-10">
+          {/* LEFT — description, project chips, specs, expandable sections */}
+          <div className="space-y-8 lg:space-y-10">
             {/* Description */}
             <section className="space-y-3">
-              <h2 className="text-[var(--color-fg)] text-base font-semibold">
+              <h2 className="text-[var(--color-fg-subtle)] text-[11px] font-semibold uppercase tracking-widest lg:text-base lg:tracking-normal lg:text-[var(--color-fg)] lg:normal-case">
                 Description
               </h2>
               {product.description ? (
@@ -165,7 +203,9 @@ export default async function ProductPage({ params }: { params: Params }) {
                     <span className="text-[var(--color-fg)] font-medium">
                       enquire on WhatsApp
                     </span>{" "}
-                    using the panel on the right.
+                    using the panel{" "}
+                    <span className="hidden lg:inline">on the right</span>
+                    <span className="lg:hidden">at the bottom</span>.
                   </p>
                 </div>
               )}
@@ -174,7 +214,7 @@ export default async function ProductPage({ params }: { params: Params }) {
             {/* Designed for / project chips */}
             {product.project_types && product.project_types.length > 0 && (
               <section className="space-y-3">
-                <h2 className="text-[var(--color-fg)] text-base font-semibold">
+                <h2 className="text-[var(--color-fg-subtle)] text-[11px] font-semibold uppercase tracking-widest lg:text-base lg:tracking-normal lg:text-[var(--color-fg)] lg:normal-case">
                   Designed for
                 </h2>
                 <div className="flex flex-wrap gap-2">
@@ -205,10 +245,43 @@ export default async function ProductPage({ params }: { params: Params }) {
                 series: product.series?.name ?? null,
               }}
             />
+
+            {/* Expandable sections */}
+            <section>
+              <ExpandableSection title="Materials & care">
+                <p>
+                  {product.material
+                    ? `${product.material}.`
+                    : "Material details on request."}{" "}
+                  Wipe with a soft damp cloth; avoid abrasive cleaners. For
+                  detailed care instructions and certifications, enquire on
+                  WhatsApp.
+                </p>
+              </ExpandableSection>
+              <ExpandableSection title="Trade pricing & terms">
+                <p>
+                  Trade pricing on request. Volume discounts available at
+                  scale. Net terms negotiable for verified accounts. WhatsApp
+                  us with project scope and SKU for a tailored quote.
+                </p>
+              </ExpandableSection>
+              <ExpandableSection title="Shipping & lead time">
+                <p>
+                  {product.country_of_origin
+                    ? `Ships from ${product.country_of_origin}.`
+                    : "Sourced internationally."}{" "}
+                  Standard lead time{" "}
+                  <span className="font-medium">
+                    {leadTimeStr ?? "on request"}
+                  </span>
+                  . Custom timelines and white-glove delivery available — share
+                  your timeline on WhatsApp.
+                </p>
+              </ExpandableSection>
+            </section>
           </div>
 
-          {/* RIGHT — sticky inquiry card. Desktop only.
-              Mobile uses the StickyMobileBar at the viewport bottom instead. */}
+          {/* RIGHT — sticky inquiry card. Desktop only. */}
           <aside className="hidden lg:mt-0 lg:block">
             <div className="lg:sticky lg:top-24">
               <InquiryCard

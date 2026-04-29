@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ProductGalleryProps = {
@@ -209,72 +208,86 @@ function MobileGallery({ images, alt }: { images: string[]; alt: string }) {
     };
   }, [emblaApi]);
 
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const scrollTo = useCallback(
+    (i: number) => emblaApi?.scrollTo(i),
+    [emblaApi],
+  );
 
   return (
-    <div className="relative">
-      <div ref={emblaRef} className="overflow-hidden">
-        <div className="flex">
-          {images.map((src, i) => (
-            <div key={src + i} className="relative aspect-[4/3] min-w-0 flex-[0_0_100%]">
-              <div className="bg-[var(--color-accent-soft)] absolute inset-0 overflow-hidden">
-                {src ? (
-                  <Image
-                    src={src}
-                    alt={`${alt} — image ${i + 1}`}
-                    fill
-                    priority={i === 0}
-                    sizes="100vw"
-                    className="object-cover"
-                  />
-                ) : null}
+    <div>
+      {/* Swipeable hero — 1:1 aspect on mobile (Halden style) */}
+      <div className="relative">
+        <div ref={emblaRef} className="overflow-hidden">
+          <div className="flex">
+            {images.map((src, i) => (
+              <div
+                key={src + i}
+                className="relative aspect-square min-w-0 flex-[0_0_100%]"
+              >
+                <div className="bg-[var(--color-accent-soft)] absolute inset-0 overflow-hidden">
+                  {src ? (
+                    <Image
+                      src={src}
+                      alt={`${alt} — image ${i + 1}`}
+                      fill
+                      priority={i === 0}
+                      sizes="100vw"
+                      className="object-cover"
+                    />
+                  ) : null}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* Counter pill top-right */}
+        {snapCount > 1 && (
+          <div
+            className={cn(
+              "absolute right-3 top-3",
+              "bg-black/55 text-white backdrop-blur-md",
+              "rounded-full px-2.5 py-1 font-mono text-[11px] tracking-wide",
+            )}
+          >
+            {String(selected + 1).padStart(2, "0")} /{" "}
+            {String(snapCount).padStart(2, "0")}
+          </div>
+        )}
       </div>
 
+      {/* Thumbnail strip below */}
       {snapCount > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={scrollPrev}
-            aria-label="Previous image"
-            className={cn(
-              "bg-[var(--color-bg-elevated)]/80 absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 backdrop-blur-sm",
-              "border-[var(--color-border)] border shadow-sm",
-            )}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            onClick={scrollNext}
-            aria-label="Next image"
-            className={cn(
-              "bg-[var(--color-bg-elevated)]/80 absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 backdrop-blur-sm",
-              "border-[var(--color-border)] border shadow-sm",
-            )}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-            <div className="bg-[var(--color-bg-elevated)]/80 flex gap-1.5 rounded-full px-2.5 py-1.5 backdrop-blur-sm">
-              {Array.from({ length: snapCount }).map((_, i) => (
-                <span
-                  key={i}
-                  className={cn(
-                    "h-1.5 w-1.5 rounded-full transition-all",
-                    i === selected
-                      ? "w-4 bg-[var(--color-fg)]"
-                      : "bg-[var(--color-fg-subtle)]/40",
-                  )}
+        <div className="scrollbar-hide flex gap-2 overflow-x-auto px-4 pb-1 pt-3">
+          {images.map((src, i) => (
+            <button
+              key={src + i}
+              type="button"
+              onClick={() => scrollTo(i)}
+              aria-label={`Go to image ${i + 1}`}
+              aria-current={selected === i}
+              className={cn(
+                "relative h-14 w-14 shrink-0 overflow-hidden rounded-md transition-all",
+                "border-2",
+                selected === i
+                  ? "border-[var(--color-accent)] opacity-100"
+                  : "border-transparent opacity-70 hover:opacity-100",
+              )}
+            >
+              {src ? (
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  sizes="56px"
+                  className="object-cover"
                 />
-              ))}
-            </div>
-          </div>
-        </>
+              ) : (
+                <div className="bg-[var(--color-accent-soft)] h-full w-full" />
+              )}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );

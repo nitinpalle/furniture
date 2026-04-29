@@ -3,8 +3,7 @@ import { flagFor } from "@/lib/country";
 
 type Spec = {
   label: string;
-  value: string | null | undefined;
-  monospace?: boolean;
+  value: string;
 };
 
 type SpecsListProps = {
@@ -21,74 +20,69 @@ type SpecsListProps = {
     pairedChair?: string | null;
   };
   className?: string;
+  /** Hide the section heading (parent already provides one). */
+  hideHeading?: boolean;
 };
 
 /**
- * Key attributes / specs section on the PDP.
- * Renders all fields we actually have; gracefully omits empty ones.
+ * Key attributes / specs section. Halden-style flat key-value rows on mobile;
+ * 2-column on desktop. Values use a mono font for the "data" feel.
  */
-export function SpecsList({ specs, className }: SpecsListProps) {
+export function SpecsList({ specs, className, hideHeading }: SpecsListProps) {
   const flag = flagFor(specs.countryOfOrigin);
 
   const rows: Spec[] = [
-    { label: "SKU", value: specs.sku, monospace: true },
-    { label: "Dimensions", value: specs.dimensions },
-    { label: "Seats", value: specs.capacity },
-    { label: "Material", value: specs.material },
-    { label: "Finish", value: specs.color },
+    { label: "SKU", value: specs.sku ?? "" },
+    { label: "Dimensions", value: specs.dimensions ?? "" },
+    { label: "Seats", value: specs.capacity ?? "" },
+    { label: "Material", value: specs.material ?? "" },
+    { label: "Finish", value: specs.color ?? "" },
     {
       label: "Country of origin",
       value: specs.countryOfOrigin
         ? `${flag ? flag + " " : ""}${specs.countryOfOrigin}`
-        : null,
+        : "",
     },
-    { label: "Series", value: specs.series },
+    { label: "Series", value: specs.series ?? "" },
     {
       label: "Paired with",
-      value: specs.pairedChair ? `Chair ${specs.pairedChair}` : null,
+      value: specs.pairedChair ? `Chair ${specs.pairedChair}` : "",
     },
     {
       label: "MOQ",
-      value: specs.moq != null ? `${specs.moq} units` : null,
+      value: specs.moq != null ? `${specs.moq} units` : "",
     },
     {
       label: "Lead time",
       value:
         specs.leadTimeDays != null
           ? `${specs.leadTimeDays}–${specs.leadTimeDays + 15} days`
-          : null,
+          : "",
     },
-  ].filter((r) => Boolean(r.value)) as Spec[];
+  ].filter((r) => r.value.length > 0);
 
   if (rows.length === 0) return null;
 
   return (
-    <section className={cn("space-y-4", className)}>
-      <h2 className="text-[var(--color-fg)] text-base font-semibold">
-        Key attributes
-      </h2>
-      <dl className="border-[var(--color-border)] grid grid-cols-1 divide-y rounded-lg border sm:grid-cols-2 sm:gap-x-8 sm:divide-y-0">
+    <section className={cn("space-y-3", className)}>
+      {!hideHeading && (
+        <h2 className="text-[var(--color-fg-subtle)] text-xs font-semibold uppercase tracking-widest">
+          Key attributes
+        </h2>
+      )}
+      <dl>
         {rows.map((row, i) => (
           <div
             key={row.label}
             className={cn(
-              "flex items-center justify-between gap-4 px-4 py-3 sm:flex-col sm:items-start sm:gap-1",
-              "sm:py-3",
-              i % 2 === 0 ? "sm:border-b" : "sm:border-b",
-              i >= rows.length - (rows.length % 2 === 0 ? 2 : 1) &&
-                "sm:!border-b-0",
-              "sm:border-[var(--color-border)]",
+              "border-[var(--color-border)] flex items-baseline justify-between gap-4 py-3.5",
+              i < rows.length - 1 && "border-b",
             )}
           >
-            <dt className="text-[var(--color-fg-subtle)] text-xs uppercase tracking-wide">
+            <dt className="text-[var(--color-fg-subtle)] text-[11px] uppercase tracking-widest">
               {row.label}
             </dt>
-            <dd
-              className={cn(
-                "text-[var(--color-fg)] text-sm font-medium",
-                row.monospace && "font-mono",
-              )}
-            >
+            <dd className="text-[var(--color-fg)] text-right font-mono text-sm font-medium">
               {row.value}
             </dd>
           </div>
