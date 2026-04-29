@@ -12,6 +12,7 @@ import { SimilarProducts } from "@/components/product/SimilarProducts";
 import { StickyMobileBar } from "@/components/product/StickyMobileBar";
 import { ExpandableSection } from "@/components/product/ExpandableSection";
 import { QuickActions } from "@/components/product/QuickActions";
+import { MobileGalleryOverlay } from "@/components/product/MobileGalleryOverlay";
 
 type Params = Promise<{ slug: string }>;
 
@@ -77,9 +78,9 @@ export default async function ProductPage({ params }: { params: Params }) {
 
   return (
     <>
-      {/* ============== Breadcrumbs (compact) ============== */}
+      {/* ============== Breadcrumbs (desktop only) ============== */}
       <nav
-        className="mx-auto max-w-7xl px-4 pt-3 text-xs lg:px-8"
+        className="mx-auto hidden max-w-7xl px-4 pt-3 text-xs lg:block lg:px-8"
         aria-label="Breadcrumb"
       >
         <ol className="text-[var(--color-fg-muted)] flex flex-wrap items-center gap-1.5">
@@ -127,34 +128,58 @@ export default async function ProductPage({ params }: { params: Params }) {
         </ol>
       </nav>
 
-      {/* ============== TITLE ROW (above gallery) ============== */}
-      <header className="mx-auto max-w-7xl px-4 pt-3 lg:px-8 lg:pt-5">
-        {/* Collection eyebrow — Halden style on mobile, hidden on desktop (subcategory shows below the layout structure) */}
-        {product.series?.name && (
-          <p className="text-[var(--color-fg-subtle)] mb-1.5 text-[11px] font-semibold uppercase tracking-widest lg:hidden">
-            {product.series.name}
-          </p>
-        )}
-        <h1 className="font-[var(--font-display)] text-balance text-2xl font-medium tracking-tight md:text-3xl lg:text-4xl">
-          {product.name}
-        </h1>
-        {summaryBits.length > 0 && (
-          <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
-            {summaryBits.join(" · ")}
-          </p>
-        )}
-      </header>
+      {/*
+        TITLE + GALLERY — order swaps by viewport.
+          Mobile: gallery first → title below.
+          Desktop: title first → gallery below.
+        Implemented with flex order classes so we render once but
+        present in either order.
+      */}
+      <div className="flex flex-col">
+        {/* Title block */}
+        <header
+          className={cn(
+            "mx-auto w-full max-w-7xl px-4 lg:px-8",
+            // Mobile: comes after gallery (order-2), tight top padding.
+            "order-2 pt-4",
+            // Desktop: comes first (order-1) with the original spacing.
+            "lg:order-1 lg:pt-5",
+          )}
+        >
+          {/* Collection eyebrow — mobile only */}
+          {product.series?.name && (
+            <p className="text-[var(--color-fg-subtle)] mb-1.5 text-[11px] font-semibold uppercase tracking-widest lg:hidden">
+              {product.series.name}
+            </p>
+          )}
+          <h1 className="font-[var(--font-display)] text-balance text-2xl font-medium tracking-tight md:text-3xl lg:text-4xl">
+            {product.name}
+          </h1>
+          {summaryBits.length > 0 && (
+            <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
+              {summaryBits.join(" · ")}
+            </p>
+          )}
+        </header>
 
-      {/* ============== GALLERY ============== */}
-      <section className="mx-auto mt-4 max-w-7xl lg:mt-5 lg:px-8">
-        {/* Mobile gallery is edge-to-edge for that Airbnb / Halden hero feel */}
-        <div className="lg:px-0 px-0 lg:[&>div]:px-0">
+        {/* Gallery */}
+        <section
+          className={cn(
+            "relative mx-auto w-full max-w-7xl lg:px-8",
+            // Mobile: comes first (order-1).
+            "order-1",
+            // Desktop: comes after title (order-2).
+            "lg:order-2 lg:mt-5",
+          )}
+        >
           <ProductGallery
             images={product.image_urls ?? []}
             alt={product.name}
           />
-        </div>
-      </section>
+          {/* Back + search buttons overlaid on the gallery (mobile only). */}
+          <MobileGalleryOverlay />
+        </section>
+      </div>
 
       {/* ============== MOBILE: origin + lead time row ============== */}
       {(product.country_of_origin || leadTimeStr) && (
