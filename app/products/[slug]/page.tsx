@@ -13,6 +13,7 @@ import { StickyMobileBar } from "@/components/product/StickyMobileBar";
 import { ExpandableSection } from "@/components/product/ExpandableSection";
 import { QuickActions } from "@/components/product/QuickActions";
 import { MobileGalleryOverlay } from "@/components/product/MobileGalleryOverlay";
+import { MobileCurveCard } from "@/components/product/MobileCurveCard";
 
 type Params = Promise<{ slug: string }>;
 
@@ -128,81 +129,73 @@ export default async function ProductPage({ params }: { params: Params }) {
         </ol>
       </nav>
 
+      {/* ============== DESKTOP TITLE (above gallery) ============== */}
+      <header className="mx-auto hidden max-w-7xl px-4 lg:block lg:px-8 lg:pt-5">
+        <h1 className="font-[var(--font-display)] text-balance text-3xl font-medium tracking-tight lg:text-4xl">
+          {product.name}
+        </h1>
+        {summaryBits.length > 0 && (
+          <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
+            {summaryBits.join(" · ")}
+          </p>
+        )}
+      </header>
+
+      {/* ============== GALLERY (both viewports) ============== */}
+      <section className="relative mx-auto w-full max-w-7xl lg:mt-5 lg:px-8">
+        <ProductGallery
+          images={product.image_urls ?? []}
+          alt={product.name}
+        />
+        {/* Back + search buttons overlaid on the gallery (mobile only). */}
+        <MobileGalleryOverlay />
+      </section>
+
       {/*
-        TITLE + GALLERY — order swaps by viewport.
-          Mobile: gallery first → title below.
-          Desktop: title first → gallery below.
-        Implemented with flex order classes so we render once but
-        present in either order.
+        Mobile curve card — wraps everything below the gallery so it can
+        slide up over the gallery's bottom edge with rounded top corners.
+        Desktop: passthrough (no scoop).
       */}
-      <div className="flex flex-col">
-        {/* Title block */}
-        <header
-          className={cn(
-            "mx-auto w-full max-w-7xl px-4 lg:px-8",
-            // Mobile: comes after gallery (order-2), tight top padding.
-            "order-2 pt-4",
-            // Desktop: comes first (order-1) with the original spacing.
-            "lg:order-1 lg:pt-5",
-          )}
-        >
-          {/* Collection eyebrow — mobile only */}
+      <MobileCurveCard>
+        {/* ============== MOBILE TITLE (inside the curve card) ============== */}
+        <header className="mx-auto max-w-7xl px-5 pt-2 lg:hidden">
           {product.series?.name && (
-            <p className="text-[var(--color-fg-subtle)] mb-1.5 text-[11px] font-semibold uppercase tracking-widest lg:hidden">
+            <p className="text-[var(--color-fg-subtle)] mb-2 text-[10px] font-semibold uppercase tracking-[0.18em]">
               {product.series.name}
             </p>
           )}
-          <h1 className="font-[var(--font-display)] text-balance text-2xl font-medium tracking-tight md:text-3xl lg:text-4xl">
+          <h1 className="font-[var(--font-display)] text-balance text-[28px] font-medium leading-[1.1] tracking-tight">
             {product.name}
           </h1>
           {summaryBits.length > 0 && (
-            <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
+            <p className="text-[var(--color-fg-muted)] mt-2 text-sm leading-relaxed">
               {summaryBits.join(" · ")}
             </p>
           )}
         </header>
 
-        {/* Gallery */}
-        <section
-          className={cn(
-            "relative mx-auto w-full max-w-7xl lg:px-8",
-            // Mobile: comes first (order-1).
-            "order-1",
-            // Desktop: comes after title (order-2).
-            "lg:order-2 lg:mt-5",
-          )}
-        >
-          <ProductGallery
-            images={product.image_urls ?? []}
-            alt={product.name}
-          />
-          {/* Back + search buttons overlaid on the gallery (mobile only). */}
-          <MobileGalleryOverlay />
-        </section>
-      </div>
-
-      {/* ============== MOBILE: origin + lead time row ============== */}
-      {(product.country_of_origin || leadTimeStr) && (
-        <section className="mx-auto mt-4 max-w-7xl px-4 lg:hidden">
-          <div className="text-[var(--color-fg-muted)] flex items-center gap-2 text-xs">
-            {flag && <span aria-hidden>{flag}</span>}
-            {product.country_of_origin && (
-              <span>Made in {product.country_of_origin}</span>
-            )}
-            {leadTimeStr && (
-              <>
-                <span className="text-[var(--color-fg-subtle)]" aria-hidden>·</span>
-                <span className="font-mono text-[11px] uppercase tracking-wide">
-                  Lead {leadTimeStr}
-                </span>
-              </>
-            )}
-          </div>
-        </section>
-      )}
+        {/* ============== MOBILE: origin + lead time row ============== */}
+        {(product.country_of_origin || leadTimeStr) && (
+          <section className="mx-auto mt-4 max-w-7xl px-5 lg:hidden">
+            <div className="text-[var(--color-fg-muted)] flex items-center gap-2 text-xs">
+              {flag && <span aria-hidden>{flag}</span>}
+              {product.country_of_origin && (
+                <span>Made in {product.country_of_origin}</span>
+              )}
+              {leadTimeStr && (
+                <>
+                  <span className="text-[var(--color-fg-subtle)]" aria-hidden>·</span>
+                  <span className="font-mono text-[11px] uppercase tracking-wide">
+                    Lead {leadTimeStr}
+                  </span>
+                </>
+              )}
+            </div>
+          </section>
+        )}
 
       {/* ============== TWO-COLUMN: details (60%) + sticky inquiry card (40%) ============== */}
-      <section className="mx-auto max-w-7xl px-4 pb-20 pt-8 lg:px-8 lg:pb-16 lg:pt-10">
+      <section className="mx-auto max-w-7xl px-5 pb-20 pt-8 lg:px-8 lg:pb-16 lg:pt-10">
         <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:gap-12 xl:gap-16">
           {/* LEFT — description, project chips, specs, expandable sections */}
           <div className="space-y-8 lg:space-y-10">
@@ -320,6 +313,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           </aside>
         </div>
       </section>
+      </MobileCurveCard>
 
       {/* ============== FULL-WIDTH SIMILAR PRODUCTS ============== */}
       {similar.length > 0 && (
