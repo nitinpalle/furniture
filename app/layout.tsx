@@ -5,6 +5,7 @@ import { getNavCategories, PROJECT_TYPES } from "@/lib/nav-data";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
+import { SearchOverlay } from "@/components/layout/SearchOverlay";
 import "./globals.css";
 
 const inter = Inter({
@@ -42,6 +43,7 @@ export default async function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer categories={categories} />
         <FloatingWhatsApp />
+        <SearchOverlay />
       </body>
     </html>
   );

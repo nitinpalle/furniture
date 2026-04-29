@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, Search } from "lucide-react";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { cn } from "@/lib/utils";
 import { brand } from "@/lib/brand";
 import type { NavCategory, NavProjectType } from "@/lib/nav-data";
+import { useUIStore } from "@/lib/stores/ui";
 import { WhatsAppCTA } from "./WhatsAppCTA";
-import { SearchOverlay } from "./SearchOverlay";
 import { MobileDrawer } from "./MobileDrawer";
 
 type NavbarProps = {
@@ -18,14 +19,22 @@ type NavbarProps = {
 
 const HIDE_THRESHOLD = 80;
 
+// Routes where the navbar's chrome is suppressed on mobile (the page
+// renders its own back/search overlay on the gallery instead).
+function shouldHideChromeOnMobile(pathname: string) {
+  return pathname.startsWith("/products/") && pathname !== "/products";
+}
+
 export function Navbar({ categories, projectTypes }: NavbarProps) {
+  const pathname = usePathname();
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<"catalog" | "project" | null>(
     null,
   );
+  const setSearchOpen = useUIStore((s) => s.setSearchOpen);
+  const hideChromeOnMobile = shouldHideChromeOnMobile(pathname);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const prev = scrollY.getPrevious() ?? 0;
@@ -59,6 +68,9 @@ export function Navbar({ categories, projectTypes }: NavbarProps) {
         className={cn(
           "sticky top-0 z-50 w-full border-b backdrop-blur-md",
           "border-[var(--color-border)] bg-[var(--color-bg)]/80",
+          // On mobile PDP the page provides its own back/search overlay
+          // on the gallery; hide the global navbar chrome there.
+          hideChromeOnMobile && "hidden lg:flex",
         )}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:h-18 lg:px-8">
@@ -177,7 +189,7 @@ export function Navbar({ categories, projectTypes }: NavbarProps) {
         </div>
       </motion.header>
 
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+      {/* SearchOverlay is rendered globally in app/layout.tsx — do not duplicate. */}
       <MobileDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}

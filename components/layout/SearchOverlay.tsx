@@ -1,24 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useUIStore } from "@/lib/stores/ui";
 
-type SearchOverlayProps = {
-  open: boolean;
-  onClose: () => void;
-};
-
-export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
+/**
+ * Sitewide search modal. Renders once at the layout level; opened by any
+ * caller that flips `searchOpen` in the UI store (Navbar icon, mobile PDP
+ * gallery overlay, etc.).
+ */
+export function SearchOverlay() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const open = useUIStore((s) => s.searchOpen);
+  const setOpen = useUIStore((s) => s.setSearchOpen);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const close = useCallback(() => {
-    setQuery("");
-    onClose();
-  }, [onClose]);
+    if (inputRef.current) inputRef.current.value = "";
+    setOpen(false);
+  }, [setOpen]);
 
   // Lock scroll + Esc to close
   useEffect(() => {
@@ -36,7 +39,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const q = query.trim();
+    const q = inputRef.current?.value.trim() ?? "";
     if (!q) return;
     router.push(`/products?q=${encodeURIComponent(q)}`);
     close();
@@ -76,10 +79,9 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                 aria-hidden
               />
               <input
+                ref={inputRef}
                 autoFocus
                 type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search products by name, SKU, or material…"
                 className="text-[var(--color-fg)] placeholder:text-[var(--color-fg-subtle)] flex-1 bg-transparent py-4 text-base outline-none"
               />
@@ -93,8 +95,15 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
               </button>
             </form>
             <p className="text-[var(--color-fg-subtle)] mt-3 text-center text-xs">
-              Press <kbd className="bg-[var(--color-border)] rounded px-1.5 py-0.5 font-mono text-[10px]">Enter</kbd> to search ·{" "}
-              <kbd className="bg-[var(--color-border)] rounded px-1.5 py-0.5 font-mono text-[10px]">Esc</kbd> to close
+              Press{" "}
+              <kbd className="bg-[var(--color-border)] rounded px-1.5 py-0.5 font-mono text-[10px]">
+                Enter
+              </kbd>{" "}
+              to search ·{" "}
+              <kbd className="bg-[var(--color-border)] rounded px-1.5 py-0.5 font-mono text-[10px]">
+                Esc
+              </kbd>{" "}
+              to close
             </p>
           </motion.div>
         </motion.div>
