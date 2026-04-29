@@ -52,10 +52,19 @@ function DesktopCollage({ images, alt }: { images: string[]; alt: string }) {
     );
   }
 
-  // 1 image — full-width 16:9
+  // Fixed responsive heights — keeps gallery inside ~half of typical
+  // laptop viewport so the description + inquiry card peek above the fold.
+  const heightClass = "h-[380px] md:h-[420px] lg:h-[460px] xl:h-[520px]";
+
+  // 1 image — full-width
   if (images.length === 1) {
     return (
-      <div className="bg-[var(--color-accent-soft)] relative aspect-[16/9] overflow-hidden rounded-xl">
+      <div
+        className={cn(
+          "bg-[var(--color-accent-soft)] relative w-full overflow-hidden rounded-xl",
+          heightClass,
+        )}
+      >
         <Image
           src={images[0]}
           alt={alt}
@@ -71,7 +80,12 @@ function DesktopCollage({ images, alt }: { images: string[]; alt: string }) {
   // 2 images — 2-column split
   if (images.length === 2) {
     return (
-      <div className="grid aspect-[16/8] grid-cols-2 gap-2 overflow-hidden rounded-xl">
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-2 overflow-hidden rounded-xl",
+          heightClass,
+        )}
+      >
         {images.map((src, i) => (
           <div
             key={src + i}
@@ -94,7 +108,12 @@ function DesktopCollage({ images, alt }: { images: string[]; alt: string }) {
   // 3-4 images — 1 large left, rest stacked right
   if (images.length < 5) {
     return (
-      <div className="grid aspect-[16/8] grid-cols-2 gap-2 overflow-hidden rounded-xl">
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-2 overflow-hidden rounded-xl",
+          heightClass,
+        )}
+      >
         <div className="bg-[var(--color-accent-soft)] relative h-full overflow-hidden">
           <Image
             src={images[0]}
@@ -127,7 +146,12 @@ function DesktopCollage({ images, alt }: { images: string[]; alt: string }) {
 
   // 5+ images — Airbnb-style: 1 large left, 4 in 2x2 right
   return (
-    <div className="grid aspect-[16/8] grid-cols-2 gap-2 overflow-hidden rounded-xl">
+    <div
+      className={cn(
+        "grid grid-cols-2 gap-2 overflow-hidden rounded-xl",
+        heightClass,
+      )}
+    >
       <div className="bg-[var(--color-accent-soft)] relative h-full overflow-hidden">
         <Image
           src={images[0]}

@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { cn } from "@/lib/utils";
+import { flagFor } from "@/lib/country";
 import { getProductBySlug, getSimilarProducts } from "@/lib/products";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { InquiryCard } from "@/components/product/InquiryCard";
 import { SpecsList } from "@/components/product/SpecsList";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
-import { FloatingProductCTA } from "@/components/product/FloatingProductCTA";
+import { StickyMobileBar } from "@/components/product/StickyMobileBar";
 
 type Params = Promise<{ slug: string }>;
 
@@ -59,11 +60,20 @@ export default async function ProductPage({ params }: { params: Params }) {
     series: product.series?.name ?? null,
   };
 
+  const flag = flagFor(product.country_of_origin);
+  const summaryBits = [
+    product.dimensions,
+    product.capacity,
+    product.country_of_origin
+      ? `${flag ? flag + " " : ""}Made in ${product.country_of_origin}`
+      : null,
+  ].filter(Boolean) as string[];
+
   return (
     <>
-      {/* Breadcrumbs */}
+      {/* ============== Breadcrumbs (compact) ============== */}
       <nav
-        className="mx-auto max-w-7xl px-4 py-4 text-xs lg:px-8"
+        className="mx-auto max-w-7xl px-4 pt-3 text-xs lg:px-8"
         aria-label="Breadcrumb"
       >
         <ol className="text-[var(--color-fg-muted)] flex flex-wrap items-center gap-1.5">
@@ -111,8 +121,30 @@ export default async function ProductPage({ params }: { params: Params }) {
         </ol>
       </nav>
 
-      {/* ============== TOP HERO GALLERY (full max-w width) ============== */}
-      <section className="mx-auto max-w-7xl px-4 lg:px-8">
+      {/* ============== TITLE ROW (above gallery, Airbnb-style) ============== */}
+      {/* Mobile: simple stack. Desktop: title left + SKU right */}
+      <header className="mx-auto max-w-7xl px-4 pt-3 lg:px-8 lg:pt-5">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
+          <div className="min-w-0">
+            <h1 className="font-[var(--font-display)] text-balance text-2xl font-medium tracking-tight md:text-3xl lg:text-4xl">
+              {product.name}
+            </h1>
+            {summaryBits.length > 0 && (
+              <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
+                {summaryBits.join(" · ")}
+              </p>
+            )}
+          </div>
+          {product.sku && (
+            <p className="text-[var(--color-fg-subtle)] hidden whitespace-nowrap font-mono text-sm md:block">
+              SKU {product.sku}
+            </p>
+          )}
+        </div>
+      </header>
+
+      {/* ============== TOP HERO GALLERY (height-capped) ============== */}
+      <section className="mx-auto mt-4 max-w-7xl px-4 lg:px-8 lg:mt-5">
         <ProductGallery
           images={product.image_urls ?? []}
           alt={product.name}
@@ -120,27 +152,10 @@ export default async function ProductPage({ params }: { params: Params }) {
       </section>
 
       {/* ============== TWO-COLUMN: details (60%) + sticky inquiry card (40%) ============== */}
-      <section className="mx-auto max-w-7xl px-4 pb-20 pt-10 lg:px-8 lg:pb-16 lg:pt-14">
+      <section className="mx-auto max-w-7xl px-4 pb-20 pt-8 lg:px-8 lg:pb-16 lg:pt-10">
         <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:gap-12 xl:gap-16">
-          {/* LEFT — title, description, specs, project chips */}
+          {/* LEFT — description, project chips, specs */}
           <div className="space-y-10">
-            {/* Title block */}
-            <header className="border-[var(--color-border)] space-y-3 border-b pb-6">
-              {product.subcategory && (
-                <p className="text-[var(--color-fg-subtle)] text-xs font-mono uppercase tracking-widest">
-                  {product.subcategory.name}
-                </p>
-              )}
-              <h1 className="font-[var(--font-display)] text-balance text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
-                {product.name}
-              </h1>
-              {product.sku && (
-                <p className="text-[var(--color-fg-muted)] font-mono text-sm">
-                  SKU {product.sku}
-                </p>
-              )}
-            </header>
-
             {/* Description */}
             <section className="space-y-3">
               <h2 className="text-[var(--color-fg)] text-base font-semibold">
@@ -229,10 +244,12 @@ export default async function ProductPage({ params }: { params: Params }) {
         </section>
       )}
 
-      {/* Mobile floating CTA — appears after 10% scroll, only on /products/[slug] */}
-      <FloatingProductCTA
+      {/* Mobile sticky bottom bar — appears after 10% scroll */}
+      <StickyMobileBar
         productId={product.id}
         product={productForEnquiry}
+        moq={product.moq}
+        leadTimeDays={product.lead_time_days}
       />
     </>
   );
