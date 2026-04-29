@@ -60,10 +60,11 @@ export default async function ProductPage({ params }: { params: Params }) {
     series: product.series?.name ?? null,
   };
 
+  // Above-the-gallery summary kept minimal — title + dims + country only.
+  // Capacity, SKU, material, etc. live in the SpecsList below the gallery.
   const flag = flagFor(product.country_of_origin);
   const summaryBits = [
     product.dimensions,
-    product.capacity,
     product.country_of_origin
       ? `${flag ? flag + " " : ""}Made in ${product.country_of_origin}`
       : null,
@@ -122,25 +123,16 @@ export default async function ProductPage({ params }: { params: Params }) {
       </nav>
 
       {/* ============== TITLE ROW (above gallery, Airbnb-style) ============== */}
-      {/* Mobile: simple stack. Desktop: title left + SKU right */}
+      {/* Minimal: title + summary (dimensions · country of origin only). */}
       <header className="mx-auto max-w-7xl px-4 pt-3 lg:px-8 lg:pt-5">
-        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-1">
-          <div className="min-w-0">
-            <h1 className="font-[var(--font-display)] text-balance text-2xl font-medium tracking-tight md:text-3xl lg:text-4xl">
-              {product.name}
-            </h1>
-            {summaryBits.length > 0 && (
-              <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
-                {summaryBits.join(" · ")}
-              </p>
-            )}
-          </div>
-          {product.sku && (
-            <p className="text-[var(--color-fg-subtle)] hidden whitespace-nowrap font-mono text-sm md:block">
-              SKU {product.sku}
-            </p>
-          )}
-        </div>
+        <h1 className="font-[var(--font-display)] text-balance text-2xl font-medium tracking-tight md:text-3xl lg:text-4xl">
+          {product.name}
+        </h1>
+        {summaryBits.length > 0 && (
+          <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
+            {summaryBits.join(" · ")}
+          </p>
+        )}
       </header>
 
       {/* ============== TOP HERO GALLERY (height-capped) ============== */}
@@ -215,8 +207,9 @@ export default async function ProductPage({ params }: { params: Params }) {
             />
           </div>
 
-          {/* RIGHT — sticky inquiry card */}
-          <aside className="mt-10 lg:mt-0">
+          {/* RIGHT — sticky inquiry card. Desktop only.
+              Mobile uses the StickyMobileBar at the viewport bottom instead. */}
+          <aside className="hidden lg:mt-0 lg:block">
             <div className="lg:sticky lg:top-24">
               <InquiryCard
                 productId={product.id}
