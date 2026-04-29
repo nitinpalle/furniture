@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/lib/utils";
@@ -209,88 +209,49 @@ function MobileGallery({ images, alt, openAt }: MobileGalleryProps) {
     };
   }, [emblaApi]);
 
-  const scrollTo = useCallback(
-    (i: number) => emblaApi?.scrollTo(i),
-    [emblaApi],
-  );
-
+  // Single, swipe-only gallery — no thumbnail strip below. Multi-image
+  // products navigate by swiping within the same gallery slot, so the
+  // page structure is identical for 1-image and N-image products.
   return (
-    <div>
-      {/* Swipeable hero — 1:1 aspect on mobile (Halden style) */}
-      <div className="relative">
-        <div ref={emblaRef} className="overflow-hidden">
-          <div className="flex">
-            {images.map((src, i) => (
-              <button
-                key={src + i}
-                type="button"
-                onClick={() => src && openAt(i)}
-                aria-label={`View image ${i + 1} fullscreen`}
-                className="relative aspect-square min-w-0 flex-[0_0_100%] cursor-zoom-in p-0 text-left"
-              >
-                <div className="bg-[var(--color-accent-soft)] absolute inset-0 overflow-hidden">
-                  {src ? (
-                    <Image
-                      src={src}
-                      alt={`${alt} — image ${i + 1}`}
-                      fill
-                      priority={i === 0}
-                      sizes="100vw"
-                      className="object-cover"
-                    />
-                  ) : null}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Counter pill top-right */}
-        {snapCount > 1 && (
-          <div
-            className={cn(
-              "absolute right-3 top-3 pointer-events-none",
-              "bg-black/55 text-white backdrop-blur-md",
-              "rounded-full px-2.5 py-1 font-mono text-[11px] tracking-wide",
-            )}
-          >
-            {String(selected + 1).padStart(2, "0")} /{" "}
-            {String(snapCount).padStart(2, "0")}
-          </div>
-        )}
-      </div>
-
-      {/* Thumbnail strip below */}
-      {snapCount > 1 && (
-        <div className="scrollbar-hide flex gap-2 overflow-x-auto px-4 pb-1 pt-3">
+    <div className="relative">
+      <div ref={emblaRef} className="overflow-hidden">
+        <div className="flex">
           {images.map((src, i) => (
             <button
               key={src + i}
               type="button"
-              onClick={() => scrollTo(i)}
-              aria-label={`Go to image ${i + 1}`}
-              aria-current={selected === i}
-              className={cn(
-                "relative h-14 w-14 shrink-0 overflow-hidden rounded-md transition-all",
-                "border-2",
-                selected === i
-                  ? "border-[var(--color-accent)] opacity-100"
-                  : "border-transparent opacity-70 hover:opacity-100",
-              )}
+              onClick={() => src && openAt(i)}
+              aria-label={`View image ${i + 1} fullscreen`}
+              className="relative aspect-square min-w-0 flex-[0_0_100%] cursor-zoom-in p-0 text-left"
             >
-              {src ? (
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="56px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="bg-[var(--color-accent-soft)] h-full w-full" />
-              )}
+              <div className="bg-[var(--color-accent-soft)] absolute inset-0 overflow-hidden">
+                {src ? (
+                  <Image
+                    src={src}
+                    alt={`${alt} — image ${i + 1}`}
+                    fill
+                    priority={i === 0}
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                ) : null}
+              </div>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Counter pill — only signal that there are multiple images */}
+      {snapCount > 1 && (
+        <div
+          className={cn(
+            "absolute right-3 top-3 pointer-events-none",
+            "bg-black/55 text-white backdrop-blur-md",
+            "rounded-full px-2.5 py-1 font-mono text-[11px] tracking-wide",
+          )}
+        >
+          {String(selected + 1).padStart(2, "0")} /{" "}
+          {String(snapCount).padStart(2, "0")}
         </div>
       )}
     </div>
