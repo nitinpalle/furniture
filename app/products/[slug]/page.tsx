@@ -201,11 +201,6 @@ export default async function ProductPage({ params }: { params: Params }) {
         </section>
       )}
 
-      {/* ============== MOBILE: quick actions ============== */}
-      <section className="mx-auto mt-4 max-w-7xl px-4 lg:hidden">
-        <QuickActions productName={product.name} />
-      </section>
-
       {/* ============== TWO-COLUMN: details (60%) + sticky inquiry card (40%) ============== */}
       <section className="mx-auto max-w-7xl px-4 pb-20 pt-8 lg:px-8 lg:pb-16 lg:pt-10">
         <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:gap-12 xl:gap-16">
@@ -304,6 +299,11 @@ export default async function ProductPage({ params }: { params: Params }) {
                 </p>
               </ExpandableSection>
             </section>
+
+            {/* Mobile-only: Share + Copy link, just below the accordions */}
+            <div className="lg:hidden">
+              <QuickActions productName={product.name} />
+            </div>
           </div>
 
           {/* RIGHT — sticky inquiry card. Desktop only. */}
