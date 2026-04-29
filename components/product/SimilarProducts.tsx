@@ -87,16 +87,25 @@ export function SimilarProducts({
       </div>
 
       <div ref={emblaRef} className="overflow-hidden">
+        {/*
+          Peek-edge values: each slide is sized so a fraction of the next
+          slide is visible, signalling there's more to scroll.
+            mobile: 2.2 cards visible
+            md:     3.2 cards
+            lg:     4.2 cards
+            xl:     4.5 cards
+        */}
         <div className="flex gap-3 sm:gap-4">
           {products.map((p) => (
             <div
               key={p.id}
               className={cn(
                 "min-w-0",
-                "flex-[0_0_calc((100%-0.75rem)/2)]",          // mobile: 2 per view
-                "sm:flex-[0_0_calc((100%-0.75rem*1)/2)]",     // sm: 2
-                "md:flex-[0_0_calc((100%-1rem*2)/3)]",        // md: 3
-                "xl:flex-[0_0_calc((100%-1rem*3)/4)]",        // xl: 4
+                "flex-[0_0_45%]",       // mobile: 2.2 visible
+                "sm:flex-[0_0_42%]",    // sm: ~2.4
+                "md:flex-[0_0_30%]",    // md: ~3.3
+                "lg:flex-[0_0_23%]",    // lg: ~4.3
+                "xl:flex-[0_0_22%]",    // xl: ~4.5
               )}
             >
               <ProductCard product={p} source="card" />

@@ -32,38 +32,44 @@ export default async function Home() {
 
   return (
     <>
-      {/* ============== HERO ============== */}
+      {/* ============== HERO (full-bleed) ============== */}
       <section className="border-[var(--color-border)] border-b">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:grid-cols-2 md:items-center md:gap-16 md:py-24 lg:px-8 lg:py-28">
-          <div>
-            <p className="text-[var(--color-fg-subtle)] mb-4 text-xs font-mono uppercase tracking-widest">
-              Trade catalog
-            </p>
-            <h1 className="font-[var(--font-display)] text-balance text-4xl font-medium tracking-tight md:text-5xl lg:text-6xl">
-              {brand.hero.headline}
-            </h1>
-            <p className="text-[var(--color-fg-muted)] mt-6 max-w-xl text-pretty md:text-lg">
-              {brand.hero.subhead}
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/products"
-                className={cn(buttonVariants({ variant: "primary", size: "lg" }))}
-              >
-                Browse Catalog
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-              <WhatsAppCTA
-                variant="primary"
-                template="trade-access"
-                source="hero"
-              >
-                Request Trade Access
-              </WhatsAppCTA>
+        <div className="grid md:grid-cols-2 md:items-stretch">
+          {/* Content — internal padding, sits in left half on desktop */}
+          <div className="flex items-center px-6 py-16 md:py-24 lg:px-12 lg:py-28 xl:px-20 xl:py-32">
+            <div className="max-w-xl">
+              <p className="text-[var(--color-fg-subtle)] mb-4 text-xs font-mono uppercase tracking-widest">
+                Trade catalog
+              </p>
+              <h1 className="font-[var(--font-display)] text-balance text-4xl font-medium tracking-tight md:text-5xl lg:text-6xl xl:text-7xl">
+                {brand.hero.headline}
+              </h1>
+              <p className="text-[var(--color-fg-muted)] mt-6 max-w-xl text-pretty md:text-lg">
+                {brand.hero.subhead}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/products"
+                  className={cn(
+                    buttonVariants({ variant: "primary", size: "lg" }),
+                  )}
+                >
+                  Browse Catalog
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </Link>
+                <WhatsAppCTA
+                  variant="primary"
+                  template="trade-access"
+                  source="hero"
+                >
+                  Request Trade Access
+                </WhatsAppCTA>
+              </div>
             </div>
           </div>
 
-          <div className="bg-[var(--color-accent-soft)] relative aspect-[4/3] overflow-hidden rounded-lg md:aspect-auto md:h-[480px]">
+          {/* Image — touches the right edge of the viewport */}
+          <div className="bg-[var(--color-accent-soft)] relative aspect-[4/3] overflow-hidden md:aspect-auto md:min-h-[600px]">
             <Image
               src={HERO_IMAGE_URL}
               alt="Premium dining setup curated for B2B furniture buyers"

@@ -13,84 +13,153 @@ type ProductGalleryProps = {
 };
 
 /**
- * Product image gallery. Single component handles 1..N images.
+ * Airbnb-style top-hero gallery.
  *
- * Mobile: full-width swipeable carousel with dot indicators.
- * Desktop: hero image + thumbnail strip on the side. Sticky positioning
- *          is applied by the parent container (the page composes it).
+ * Desktop (lg+):
+ *   - 1 image  → full-width 16:9 hero
+ *   - 2 images → 2-column split (each ~50%)
+ *   - 3 images → 1 large left + 2 stacked right
+ *   - 4 images → 1 large left + 3 stacked right
+ *   - 5+ images → Airbnb 5-photo collage (1 large left, 4 in 2x2 right)
+ *
+ * Mobile (<lg): full-width swipeable carousel with chevrons + dot pager.
  */
 export function ProductGallery({ images, alt, className }: ProductGalleryProps) {
-  const safe = images.length > 0 ? images : [""];
+  const safe = images.filter(Boolean);
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
+    <div className={cn(className)}>
       <div className="hidden lg:block">
-        <DesktopGallery images={safe} alt={alt} />
+        <DesktopCollage images={safe} alt={alt} />
       </div>
       <div className="lg:hidden">
-        <MobileGallery images={safe} alt={alt} />
+        <MobileGallery images={safe.length > 0 ? safe : [""]} alt={alt} />
       </div>
     </div>
   );
 }
 
 // ============================================================
-// DESKTOP — hero + thumbnails
+// DESKTOP — collage that adapts to image count
 // ============================================================
 
-function DesktopGallery({ images, alt }: { images: string[]; alt: string }) {
-  const [active, setActive] = useState(0);
-  const cover = images[active];
+function DesktopCollage({ images, alt }: { images: string[]; alt: string }) {
+  if (images.length === 0) {
+    return (
+      <div className="bg-[var(--color-accent-soft)] flex aspect-[16/9] items-center justify-center rounded-xl">
+        <p className="text-[var(--color-fg-subtle)] text-sm">No image</p>
+      </div>
+    );
+  }
 
-  return (
-    <div className="flex gap-4">
-      {images.length > 1 && (
-        <div className="flex w-20 shrink-0 flex-col gap-2">
-          {images.map((src, i) => (
-            <button
-              key={src + i}
-              type="button"
-              onClick={() => setActive(i)}
-              aria-label={`View image ${i + 1}`}
-              aria-current={active === i}
-              className={cn(
-                "relative aspect-square overflow-hidden rounded-md border-2 transition-all",
-                active === i
-                  ? "border-[var(--color-accent)]"
-                  : "border-[var(--color-border)] hover:border-[var(--color-border-strong)]",
-              )}
-            >
-              {src ? (
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="80px"
-                  className="object-cover"
-                />
-              ) : (
-                <div className="bg-[var(--color-accent-soft)] absolute inset-0" />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
+  // 1 image — full-width 16:9
+  if (images.length === 1) {
+    return (
+      <div className="bg-[var(--color-accent-soft)] relative aspect-[16/9] overflow-hidden rounded-xl">
+        <Image
+          src={images[0]}
+          alt={alt}
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 90vw"
+          className="object-cover"
+        />
+      </div>
+    );
+  }
 
-      <div className="bg-[var(--color-accent-soft)] relative aspect-[4/3] flex-1 overflow-hidden rounded-lg">
-        {cover ? (
+  // 2 images — 2-column split
+  if (images.length === 2) {
+    return (
+      <div className="grid aspect-[16/8] grid-cols-2 gap-2 overflow-hidden rounded-xl">
+        {images.map((src, i) => (
+          <div
+            key={src + i}
+            className="bg-[var(--color-accent-soft)] relative h-full overflow-hidden"
+          >
+            <Image
+              src={src}
+              alt={`${alt} — image ${i + 1}`}
+              fill
+              priority={i === 0}
+              sizes="50vw"
+              className="object-cover"
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 3-4 images — 1 large left, rest stacked right
+  if (images.length < 5) {
+    return (
+      <div className="grid aspect-[16/8] grid-cols-2 gap-2 overflow-hidden rounded-xl">
+        <div className="bg-[var(--color-accent-soft)] relative h-full overflow-hidden">
           <Image
-            src={cover}
-            alt={alt}
+            src={images[0]}
+            alt={`${alt} — main`}
             fill
             priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
+            sizes="50vw"
             className="object-cover"
           />
-        ) : (
-          <div className="text-[var(--color-fg-subtle)] absolute inset-0 flex items-center justify-center text-sm">
-            No image
+        </div>
+        <div className="flex h-full flex-col gap-2">
+          {images.slice(1).map((src, i) => (
+            <div
+              key={src + i}
+              className="bg-[var(--color-accent-soft)] relative flex-1 overflow-hidden"
+            >
+              <Image
+                src={src}
+                alt={`${alt} — image ${i + 2}`}
+                fill
+                sizes="50vw"
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // 5+ images — Airbnb-style: 1 large left, 4 in 2x2 right
+  return (
+    <div className="grid aspect-[16/8] grid-cols-2 gap-2 overflow-hidden rounded-xl">
+      <div className="bg-[var(--color-accent-soft)] relative h-full overflow-hidden">
+        <Image
+          src={images[0]}
+          alt={`${alt} — main`}
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover"
+        />
+      </div>
+      <div className="grid grid-cols-2 grid-rows-2 gap-2">
+        {images.slice(1, 5).map((src, i) => (
+          <div
+            key={src + i}
+            className="bg-[var(--color-accent-soft)] relative overflow-hidden"
+          >
+            <Image
+              src={src}
+              alt={`${alt} — image ${i + 2}`}
+              fill
+              sizes="25vw"
+              className="object-cover"
+            />
+            {i === 3 && images.length > 5 && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                <span className="text-sm font-medium text-white">
+                  +{images.length - 5} more
+                </span>
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

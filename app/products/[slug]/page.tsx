@@ -2,14 +2,22 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { brand } from "@/lib/brand";
+import { cn } from "@/lib/utils";
 import { getProductBySlug, getSimilarProducts } from "@/lib/products";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { InquiryCard } from "@/components/product/InquiryCard";
 import { SpecsList } from "@/components/product/SpecsList";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
-import { StickyMobileCTA } from "@/components/product/StickyMobileCTA";
+import { FloatingProductCTA } from "@/components/product/FloatingProductCTA";
 
 type Params = Promise<{ slug: string }>;
+
+const PROJECT_LABELS: Record<string, string> = {
+  hospitality: "Hospitality",
+  residential: "Residential",
+  office: "Office",
+  restaurant: "Restaurant",
+};
 
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
@@ -40,7 +48,7 @@ export default async function ProductPage({ params }: { params: Params }) {
       capacity: product.capacity,
       category_id: product.category_id,
     },
-    4,
+    8,
   );
 
   const productForEnquiry = {
@@ -103,27 +111,27 @@ export default async function ProductPage({ params }: { params: Params }) {
         </ol>
       </nav>
 
-      {/* Two-panel layout */}
-      <div className="mx-auto max-w-7xl px-4 pb-24 lg:pb-12 lg:px-8">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-12 xl:gap-16">
-          {/* Left: gallery (sticky on desktop) */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
-            <ProductGallery
-              images={product.image_urls ?? []}
-              alt={product.name}
-            />
-          </div>
+      {/* ============== TOP HERO GALLERY (full max-w width) ============== */}
+      <section className="mx-auto max-w-7xl px-4 lg:px-8">
+        <ProductGallery
+          images={product.image_urls ?? []}
+          alt={product.name}
+        />
+      </section>
 
-          {/* Right: scrollable content */}
-          <div className="mt-8 space-y-10 lg:mt-0">
+      {/* ============== TWO-COLUMN: details (60%) + sticky inquiry card (40%) ============== */}
+      <section className="mx-auto max-w-7xl px-4 pb-20 pt-10 lg:px-8 lg:pb-16 lg:pt-14">
+        <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:gap-12 xl:gap-16">
+          {/* LEFT — title, description, specs, project chips */}
+          <div className="space-y-10">
             {/* Title block */}
-            <header className="space-y-2">
+            <header className="border-[var(--color-border)] space-y-3 border-b pb-6">
               {product.subcategory && (
                 <p className="text-[var(--color-fg-subtle)] text-xs font-mono uppercase tracking-widest">
                   {product.subcategory.name}
                 </p>
               )}
-              <h1 className="font-[var(--font-display)] text-balance text-3xl font-medium tracking-tight md:text-4xl">
+              <h1 className="font-[var(--font-display)] text-balance text-3xl font-medium tracking-tight md:text-4xl lg:text-5xl">
                 {product.name}
               </h1>
               {product.sku && (
@@ -133,22 +141,13 @@ export default async function ProductPage({ params }: { params: Params }) {
               )}
             </header>
 
-            {/* Inquiry card (replaces price/cart panel) */}
-            <InquiryCard
-              productId={product.id}
-              product={productForEnquiry}
-              countryOfOrigin={product.country_of_origin}
-              moq={product.moq}
-              leadTimeDays={product.lead_time_days}
-            />
-
             {/* Description */}
             <section className="space-y-3">
               <h2 className="text-[var(--color-fg)] text-base font-semibold">
                 Description
               </h2>
               {product.description ? (
-                <p className="text-[var(--color-fg-muted)] text-sm leading-relaxed">
+                <p className="text-[var(--color-fg-muted)] text-sm leading-relaxed lg:text-base">
                   {product.description}
                 </p>
               ) : (
@@ -159,11 +158,31 @@ export default async function ProductPage({ params }: { params: Params }) {
                     <span className="text-[var(--color-fg)] font-medium">
                       enquire on WhatsApp
                     </span>{" "}
-                    using the button above.
+                    using the panel on the right.
                   </p>
                 </div>
               )}
             </section>
+
+            {/* Designed for / project chips */}
+            {product.project_types && product.project_types.length > 0 && (
+              <section className="space-y-3">
+                <h2 className="text-[var(--color-fg)] text-base font-semibold">
+                  Designed for
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {product.project_types.map((pt) => (
+                    <Link
+                      key={pt}
+                      href={`/products?project=${pt}`}
+                      className="border-[var(--color-border-strong)] hover:border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] inline-flex items-center rounded-full border px-4 py-1.5 text-xs font-medium transition-colors"
+                    >
+                      {PROJECT_LABELS[pt] ?? pt}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Key attributes */}
             <SpecsList
@@ -179,17 +198,42 @@ export default async function ProductPage({ params }: { params: Params }) {
                 series: product.series?.name ?? null,
               }}
             />
-
-            {/* Similar products carousel */}
-            {similar.length > 0 && (
-              <SimilarProducts products={similar} heading="Similar products" />
-            )}
           </div>
-        </div>
-      </div>
 
-      {/* Mobile sticky CTA */}
-      <StickyMobileCTA productId={product.id} product={productForEnquiry} />
+          {/* RIGHT — sticky inquiry card */}
+          <aside className="mt-10 lg:mt-0">
+            <div className="lg:sticky lg:top-24">
+              <InquiryCard
+                productId={product.id}
+                product={productForEnquiry}
+                countryOfOrigin={product.country_of_origin}
+                moq={product.moq}
+                leadTimeDays={product.lead_time_days}
+              />
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      {/* ============== FULL-WIDTH SIMILAR PRODUCTS ============== */}
+      {similar.length > 0 && (
+        <section
+          className={cn(
+            "border-[var(--color-border)] border-y bg-[var(--color-bg-elevated)]",
+            "py-14 lg:py-20",
+          )}
+        >
+          <div className="mx-auto max-w-7xl px-4 lg:px-8">
+            <SimilarProducts products={similar} heading="Similar products" />
+          </div>
+        </section>
+      )}
+
+      {/* Mobile floating CTA — appears after 10% scroll, only on /products/[slug] */}
+      <FloatingProductCTA
+        productId={product.id}
+        product={productForEnquiry}
+      />
     </>
   );
 }
