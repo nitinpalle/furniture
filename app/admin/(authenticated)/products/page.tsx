@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { AddProductMenu } from "@/components/admin/AddProductMenu";
 
 export const metadata = { title: "Products" };
 
@@ -85,6 +86,7 @@ export default async function AdminProductsList({
             {q && ` matching "${q}"`}
           </p>
         </div>
+        <AddProductMenu />
       </header>
 
       {/* Filters */}

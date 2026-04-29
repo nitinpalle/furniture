@@ -9,10 +9,13 @@ import { Loader2, Save, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImageManager } from "./ImageManager";
 import {
+  createProduct,
   softDeleteProduct,
   updateProduct,
+  type CreateProductInput,
   type UpdateProductInput,
 } from "@/lib/admin/actions";
+import { slugify } from "@/lib/utils";
 import type { Product } from "@/lib/database.types";
 
 const PROJECT_TYPES = [
@@ -24,8 +27,9 @@ const PROJECT_TYPES = [
 
 // Local form schema — uses strings for numeric fields so the inputs can
 // be empty strings; coerces to number/null at submit time.
+// `id` is empty string in create mode, real uuid in edit mode.
 const formSchema = z.object({
-  id: z.uuid(),
+  id: z.string(),
   name: z.string().min(1, "Required"),
   slug: z.string().min(1, "Required").regex(/^[a-z0-9-]+$/, "Lowercase, dashes only"),
   sku: z.string(),
@@ -52,7 +56,8 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 type ProductFormProps = {
-  product: Product;
+  /** Existing product for edit mode; absent for create mode. */
+  product?: Product;
   topCategories: { id: string; name: string; slug: string }[];
   subcategories: {
     id: string;
@@ -72,6 +77,7 @@ export function ProductForm({
   series,
 }: ProductFormProps) {
   const router = useRouter();
+  const isCreate = !product;
   const [pending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -84,32 +90,57 @@ export function ProductForm({
     formState: { errors, isDirty },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      sku: product.sku ?? "",
-      description: product.description ?? "",
-      description_source:
-        product.description_source === "ai" ? "ai" : "manual",
-      category_id: product.category_id ?? "",
-      subcategory_id: product.subcategory_id ?? "",
-      series_id: product.series_id ?? "",
-      supplier_id: product.supplier_id ?? "",
-      country_of_origin: product.country_of_origin ?? "",
-      dimensions: product.dimensions ?? "",
-      material: product.material ?? "",
-      color: product.color ?? "",
-      capacity: product.capacity ?? "",
-      moq: product.moq != null ? String(product.moq) : "",
-      lead_time_days:
-        product.lead_time_days != null ? String(product.lead_time_days) : "",
-      price: product.price != null ? String(product.price) : "",
-      project_types: product.project_types ?? [],
-      status: product.status === "published" ? "published" : "draft",
-      is_featured: product.is_featured,
-      image_urls: product.image_urls ?? [],
-    },
+    defaultValues: product
+      ? {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          sku: product.sku ?? "",
+          description: product.description ?? "",
+          description_source:
+            product.description_source === "ai" ? "ai" : "manual",
+          category_id: product.category_id ?? "",
+          subcategory_id: product.subcategory_id ?? "",
+          series_id: product.series_id ?? "",
+          supplier_id: product.supplier_id ?? "",
+          country_of_origin: product.country_of_origin ?? "",
+          dimensions: product.dimensions ?? "",
+          material: product.material ?? "",
+          color: product.color ?? "",
+          capacity: product.capacity ?? "",
+          moq: product.moq != null ? String(product.moq) : "",
+          lead_time_days:
+            product.lead_time_days != null ? String(product.lead_time_days) : "",
+          price: product.price != null ? String(product.price) : "",
+          project_types: product.project_types ?? [],
+          status: product.status === "published" ? "published" : "draft",
+          is_featured: product.is_featured,
+          image_urls: product.image_urls ?? [],
+        }
+      : {
+          id: "",
+          name: "",
+          slug: "",
+          sku: "",
+          description: "",
+          description_source: "manual" as const,
+          category_id: "",
+          subcategory_id: "",
+          series_id: "",
+          supplier_id: "",
+          country_of_origin: "",
+          dimensions: "",
+          material: "",
+          color: "",
+          capacity: "",
+          moq: "",
+          lead_time_days: "",
+          price: "",
+          project_types: [],
+          status: "draft" as const,
+          is_featured: false,
+          image_urls: [],
+        },
   });
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -124,10 +155,13 @@ export function ProductForm({
       const n = Number(s);
       return Number.isFinite(n) ? n : null;
     };
+    const trimmedName = v.name.trim();
+    const trimmedSlug = v.slug.trim();
     return {
       id: v.id,
-      name: v.name.trim(),
-      slug: v.slug.trim(),
+      name: trimmedName,
+      // In create mode, derive slug from name when the field was left blank.
+      slug: trimmedSlug || slugify(trimmedName),
       sku: v.sku.trim() || null,
       description: v.description.trim() || null,
       description_source: v.description_source,
@@ -150,9 +184,27 @@ export function ProductForm({
     };
   }
 
+  function toCreatePayload(v: FormValues): CreateProductInput {
+    const { id: _ignored, ...rest } = toPayload(v);
+    void _ignored;
+    return rest;
+  }
+
   const onSubmit: SubmitHandler<FormValues> = (values) => {
     setServerError(null);
     startTransition(async () => {
+      if (isCreate) {
+        const result = await createProduct(toCreatePayload(values));
+        if (!result.ok) {
+          setServerError(result.error);
+          return;
+        }
+        // Redirect into the newly-created product's edit page so images
+        // can be uploaded against a real id.
+        router.push(`/admin/products/${result.id}`);
+        router.refresh();
+        return;
+      }
       const result = await updateProduct(toPayload(values));
       if (!result.ok) {
         setServerError(result.error);
@@ -164,6 +216,7 @@ export function ProductForm({
   };
 
   function onDelete() {
+    if (!product) return;
     if (!confirm("Soft-delete this product? It will be hidden from the public site but remains recoverable.")) return;
     setServerError(null);
     startTransition(async () => {
@@ -198,21 +251,23 @@ export function ProductForm({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onDelete}
-            disabled={pending}
-            className={cn(
-              "border-[var(--color-danger)]/30 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 inline-flex h-9 items-center gap-1.5 rounded-md border px-3 text-xs font-medium",
-              "disabled:opacity-50 disabled:pointer-events-none",
-            )}
-          >
-            <Trash2 className="h-3 w-3" />
-            Delete
-          </button>
+          {!isCreate && (
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={pending}
+              className={cn(
+                "border-[var(--color-danger)]/30 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 inline-flex h-9 items-center gap-1.5 rounded-md border px-3 text-xs font-medium",
+                "disabled:opacity-50 disabled:pointer-events-none",
+              )}
+            >
+              <Trash2 className="h-3 w-3" />
+              Delete
+            </button>
+          )}
           <button
             type="submit"
-            disabled={pending || !isDirty}
+            disabled={pending || (!isCreate && !isDirty)}
             className={cn(
               "bg-[var(--color-fg)] text-[var(--color-bg)] hover:bg-[var(--color-fg-muted)] inline-flex h-9 items-center gap-1.5 rounded-md px-4 text-xs font-semibold",
               "disabled:opacity-50 disabled:pointer-events-none",
@@ -223,7 +278,13 @@ export function ProductForm({
             ) : (
               <Save className="h-3 w-3" />
             )}
-            {pending ? "Saving…" : "Save changes"}
+            {pending
+              ? isCreate
+                ? "Creating…"
+                : "Saving…"
+              : isCreate
+                ? "Create product"
+                : "Save changes"}
           </button>
         </div>
       </div>
@@ -234,8 +295,20 @@ export function ProductForm({
           <input className={inputCls} {...register("name")} />
         </Field>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="Slug" error={errors.slug?.message} hint="Public URL: /products/{slug}">
-            <input className={inputCls} {...register("slug")} />
+          <Field
+            label="Slug"
+            error={errors.slug?.message}
+            hint={
+              isCreate
+                ? "Auto-generated from name if left blank"
+                : "Public URL: /products/{slug}"
+            }
+          >
+            <input
+              className={inputCls}
+              {...register("slug")}
+              placeholder={isCreate ? "auto" : undefined}
+            />
           </Field>
           <Field label="SKU">
             <input className={inputCls} {...register("sku")} />
@@ -435,17 +508,25 @@ export function ProductForm({
 
       {/* Media */}
       <Section title="Media">
-        <Controller
-          control={control}
-          name="image_urls"
-          render={({ field }) => (
-            <ImageManager
-              productSlug={product.slug}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
+        {isCreate ? (
+          <p className="text-[var(--color-fg-muted)] border-[var(--color-border)] bg-[var(--color-bg)] rounded-md border p-4 text-sm">
+            Save the product first, then upload images here. Images are
+            stored at <span className="font-mono text-xs">products/{"{slug}"}/</span> in
+            Supabase Storage.
+          </p>
+        ) : (
+          <Controller
+            control={control}
+            name="image_urls"
+            render={({ field }) => (
+              <ImageManager
+                productSlug={product!.slug}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        )}
       </Section>
     </form>
   );
