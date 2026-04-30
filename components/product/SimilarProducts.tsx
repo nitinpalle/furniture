@@ -53,19 +53,22 @@ export function SimilarProducts({
   if (products.length === 0) return null;
 
   return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-[var(--color-fg)] text-base font-semibold">
-          {heading}
-        </h2>
-        <div className="hidden gap-1 sm:flex">
+    <section className="space-y-6">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="eyebrow mb-2">In the same room</p>
+          <h2 className="display-3 font-medium tracking-tight">{heading}</h2>
+        </div>
+        <div className="hidden gap-1.5 sm:flex">
           <button
             type="button"
             onClick={scrollPrev}
             disabled={!canPrev}
             aria-label="Previous"
             className={cn(
-              "border-[var(--color-border)] hover:bg-[var(--color-accent-soft)] inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
+              "inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-border-strong)]",
+              "transition-[transform,background-color,color,border-color] duration-[var(--duration-fast)]",
+              "hover:-translate-y-0.5 hover:border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)]",
               "disabled:opacity-40 disabled:pointer-events-none",
             )}
           >
@@ -77,7 +80,9 @@ export function SimilarProducts({
             disabled={!canNext}
             aria-label="Next"
             className={cn(
-              "border-[var(--color-border)] hover:bg-[var(--color-accent-soft)] inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors",
+              "inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-border-strong)]",
+              "transition-[transform,background-color,color,border-color] duration-[var(--duration-fast)]",
+              "hover:-translate-y-0.5 hover:border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)]",
               "disabled:opacity-40 disabled:pointer-events-none",
             )}
           >
