@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { getCategoryBySlug, listProducts } from "@/lib/products";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { ListingHeader } from "@/components/product/ListingHeader";
@@ -86,15 +87,11 @@ export default async function CategoryPage({
         </ol>
       </nav>
 
-      <header className="mb-6">
-        <p className="text-[var(--color-fg-subtle)] text-xs font-mono uppercase tracking-widest">
-          Category
-        </p>
-        <h1 className="font-[var(--font-display)] mt-2 text-3xl font-medium tracking-tight md:text-4xl">
-          {category.name}
-        </h1>
+      <header className="mb-10 lg:mb-12 iv">
+        <p className="eyebrow eyebrow-rule">Category</p>
+        <h1 className="display-1 mt-4 font-medium">{category.name}.</h1>
         {category.description && (
-          <p className="text-[var(--color-fg-muted)] mt-2 max-w-2xl text-sm">
+          <p className="mt-4 max-w-2xl text-base text-[var(--color-fg-muted)] leading-relaxed">
             {category.description}
           </p>
         )}
@@ -102,12 +99,16 @@ export default async function CategoryPage({
 
       {/* Sub-category chips */}
       {category.subcategories.length > 0 && (
-        <div className="mb-8 flex flex-wrap gap-2">
+        <div className="mb-10 lg:mb-12 flex flex-wrap gap-2 iv">
           {category.subcategories.map((sub) => (
             <Link
               key={sub.slug}
               href={`/categories/${slug}/${sub.slug}`}
-              className="border-[var(--color-border-strong)] hover:border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] inline-flex items-center rounded-full border px-4 py-1.5 text-xs font-medium transition-colors"
+              className={cn(
+                "inline-flex items-center rounded-full border border-[var(--color-border-strong)] px-4 py-1.5 text-xs font-medium",
+                "transition-[color,background-color,border-color,transform] duration-[var(--duration-fast)]",
+                "hover:-translate-y-0.5 hover:border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)]",
+              )}
             >
               {sub.name}
             </Link>
