@@ -3,18 +3,26 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap",
+  cn(
+    "inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap",
+    "transition-[transform,background-color,color,border-color,box-shadow]",
+    "duration-[var(--duration-fast)] ease-[var(--ease-out-expo)]",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    "focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-[var(--color-bg)]",
+    "disabled:opacity-50 disabled:pointer-events-none",
+    "active:translate-y-0",
+  ),
   {
     variants: {
       variant: {
         primary:
-          "bg-[var(--color-fg)] text-[var(--color-bg)] hover:bg-[var(--color-fg-muted)]",
+          "bg-[var(--color-fg)] text-[var(--color-bg)] hover:-translate-y-0.5 hover:bg-[var(--color-fg-muted)] hover:shadow-[var(--shadow-md)]",
         secondary:
-          "border border-[var(--color-border-strong)] text-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)]",
+          "border border-[var(--color-border-strong)] text-[var(--color-fg)] hover:-translate-y-0.5 hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] hover:border-[var(--color-fg)] hover:shadow-[var(--shadow-sm)]",
         ghost:
-          "text-[var(--color-fg)] hover:bg-[var(--color-bg)]/40",
+          "text-[var(--color-fg)] hover:bg-[var(--color-bg-elevated)]",
         whatsapp:
-          "bg-[var(--color-whatsapp)] text-white hover:bg-[var(--color-whatsapp-hover)] shadow-sm hover:shadow-md",
+          "bg-[var(--color-whatsapp)] text-white hover:-translate-y-0.5 hover:bg-[var(--color-whatsapp-hover)] shadow-[var(--shadow-xs)] hover:shadow-[var(--shadow-md)]",
         link:
           "text-[var(--color-fg)] underline-offset-4 hover:underline px-0",
       },
