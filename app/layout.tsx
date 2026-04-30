@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
 import { SearchOverlay } from "@/components/layout/SearchOverlay";
 import { HideOnAdmin } from "@/components/layout/HideOnAdmin";
+import { InViewReveal } from "@/components/home/InViewReveal";
 import "./globals.css";
 
 const inter = Inter({
@@ -40,6 +41,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="flex min-h-screen flex-col">
+        <InViewReveal />
         <HideOnAdmin>
           <Navbar categories={categories} projectTypes={PROJECT_TYPES} />
         </HideOnAdmin>

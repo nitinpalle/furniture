@@ -6,7 +6,6 @@ import { WhatsAppCTA } from "@/components/layout/WhatsAppCTA";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { HeroScenes, type HeroScene } from "@/components/home/HeroScenes";
 import { Showroom, type ShowroomRoom } from "@/components/home/Showroom";
-import { InViewReveal } from "@/components/home/InViewReveal";
 import { getCategoryTiles, getFeaturedProducts } from "@/lib/products";
 import { PROJECT_TYPES } from "@/lib/nav-data";
 import { cn } from "@/lib/utils";
@@ -162,8 +161,6 @@ export default async function Home() {
 
   return (
     <>
-      <InViewReveal />
-
       {/* ============== HERO (cross-fade scenes — always dark over imagery) ============== */}
       <section className="relative h-screen w-full overflow-hidden">
         <HeroScenes scenes={HERO_SCENES} />
