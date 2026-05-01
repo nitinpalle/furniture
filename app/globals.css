@@ -36,6 +36,22 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
 
+  /* Elevation ramp — warm, low-saturation shadows that read on cream */
+  --shadow-xs: 0 1px 2px oklch(0.18 0.01 60 / 0.04);
+  --shadow-sm: 0 2px 8px -2px oklch(0.18 0.01 60 / 0.06);
+  --shadow-md: 0 8px 24px -8px oklch(0.18 0.01 60 / 0.08);
+  --shadow-lg: 0 24px 56px -20px oklch(0.18 0.01 60 / 0.18);
+  --shadow-xl: 0 40px 80px -32px oklch(0.18 0.01 60 / 0.22);
+
+  /* Motion primitives — keep editing this surface, not magic numbers */
+  --ease-out-expo: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --duration-fast: 200ms;
+  --duration-base: 400ms;
+  --duration-slow: 700ms;
+  --duration-xslow: 1100ms;
+
   /* Typography */
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-display: var(--font-fraunces), Georgia, serif;
@@ -59,6 +75,11 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
+  /* Display type sharper at large sizes (Fraunces opsz). */
+  h1, h2, h3, .display {
+    font-feature-settings: "ss01", "ss02";
+  }
+
   ::selection {
     background: var(--color-accent);
     color: var(--color-accent-fg);
@@ -74,5 +95,254 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+/* ============================================
+   REUSABLE UTILITIES — opt-in, don't auto-apply
+   ============================================ */
+
+@layer components {
+  /* Eyebrow lockup — small, mono, uppercase, accent. */
+  .eyebrow {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+  .eyebrow-muted {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+    font-weight: 500;
+  }
+  .eyebrow-rule::before {
+    content: "";
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.45;
+    margin-right: 0.85rem;
+    vertical-align: middle;
+  }
+
+  /* Display headings — site-wide rhythm. */
+  .display-1 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    text-wrap: balance;
+  }
+  .display-2 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    line-height: 1.06;
+    letter-spacing: -0.018em;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    text-wrap: balance;
+  }
+  .display-3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    text-wrap: balance;
+  }
+
+  /* Section spacing — used everywhere. */
+  .section-pad {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  @media (min-width: 1024px) {
+    .section-pad { padding-top: 7rem; padding-bottom: 7rem; }
+  }
+  .section-pad-sm {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+  @media (min-width: 1024px) {
+    .section-pad-sm { padding-top: 5rem; padding-bottom: 5rem; }
+  }
+
+  /* Hairline rule used between sections. */
+  .hairline-t { border-top: 1px solid var(--color-border); }
+  .hairline-b { border-bottom: 1px solid var(--color-border); }
+
+  /* Animated underline on text links. */
+  .uline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 2px;
+    transition: background-size var(--duration-base) var(--ease-out-expo);
+  }
+  .uline:hover {
+    background-size: 0 1px;
+    background-position: 100% 100%;
+  }
+
+  /* ------- HOMEPAGE / ORIGEN COMPONENTS ------- */
+
+  /* Hero scene crossfade */
+  .scene {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+  }
+  .scene.active { opacity: 1; }
+  .scene img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.06);
+    transition: transform 8s ease;
+  }
+  .scene.active img { transform: scale(1.0); }
+
+  /* Horizontal showroom track */
+  .room-track {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .room {
+    flex: 0 0 80vw;
+    max-width: 1100px;
+    height: 80vh;
+    min-height: 560px;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+  @media (min-width: 1024px) {
+    .room { flex-basis: 70vw; }
+  }
+
+  /* Hotspot pulse */
+  .hotspot {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: oklch(from var(--color-accent) l c h / 0.18);
+    border: 1px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .hotspot::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border: 1px solid oklch(from var(--color-accent) l c h / 0.45);
+    border-radius: 50%;
+    animation: hotspot-pulse 2.4s ease-out infinite;
+  }
+  .hotspot::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: var(--color-accent);
+    border-radius: 50%;
+  }
+  @keyframes hotspot-pulse {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+  .hotspot-card {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translate(-50%, -10px);
+    width: 240px;
+    background: var(--color-bg-elevated);
+    color: var(--color-fg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+    padding: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 10;
+  }
+  .hotspot:hover .hotspot-card,
+  .hotspot:focus .hotspot-card,
+  .hotspot:focus-within .hotspot-card {
+    opacity: 1;
+    transform: translate(-50%, -16px);
+    pointer-events: auto;
+  }
+
+  /* ------- SCROLL-REVEAL SYSTEM ------- */
+
+  /* Single fade-up reveal. */
+  .iv {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity var(--duration-xslow) var(--ease-out-expo),
+      transform var(--duration-xslow) var(--ease-out-expo);
+  }
+  .iv.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Stagger delays — let containers cascade their children
+     (apply on the parent's children via :nth-child). */
+  .iv-stagger > .iv:nth-child(1) { transition-delay: 0ms; }
+  .iv-stagger > .iv:nth-child(2) { transition-delay: 60ms; }
+  .iv-stagger > .iv:nth-child(3) { transition-delay: 120ms; }
+  .iv-stagger > .iv:nth-child(4) { transition-delay: 180ms; }
+  .iv-stagger > .iv:nth-child(5) { transition-delay: 240ms; }
+  .iv-stagger > .iv:nth-child(6) { transition-delay: 300ms; }
+  .iv-stagger > .iv:nth-child(7) { transition-delay: 360ms; }
+  .iv-stagger > .iv:nth-child(8) { transition-delay: 420ms; }
+  .iv-stagger > .iv:nth-child(n + 9) { transition-delay: 480ms; }
+
+  /* Magnetic CTA hover */
+  .magnetic {
+    position: relative;
+    transition: transform var(--duration-fast) var(--ease-out-expo);
+  }
+  .magnetic:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Hide scrollbars on horizontal showroom */
+  .room-scroll::-webkit-scrollbar { height: 6px; }
+  .room-scroll::-webkit-scrollbar-track { background: transparent; }
+  .room-scroll::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 3px;
+  }
+
+  /* Slow ken-burns on a hero image (used on PDP gallery cover). */
+  .ken-burns {
+    animation: ken-burns 18s var(--ease-in-out-quart) infinite alternate;
+    will-change: transform;
+  }
+  @keyframes ken-burns {
+    from { transform: scale(1.04) translate(0, 0); }
+    to { transform: scale(1.1) translate(-1.2%, -0.8%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scene img,
+    .ken-burns { transition: none; transform: none; animation: none; }
+    .hotspot::before { animation: none; }
   }
 }

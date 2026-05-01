@@ -42,16 +42,15 @@ export default async function CatalogPage({
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-16 pt-6 lg:px-8">
-      <header className="mb-8">
-        <p className="text-[var(--color-fg-subtle)] text-xs font-mono uppercase tracking-widest">
-          Catalog
-        </p>
-        <h1 className="font-[var(--font-display)] mt-2 text-3xl font-medium tracking-tight md:text-4xl">
-          All products
-        </h1>
-        <p className="text-[var(--color-fg-muted)] mt-2 max-w-2xl text-sm">
-          {result.total} products curated for designers, architects, and contract buyers.
+    <div className="mx-auto max-w-7xl px-4 pb-20 pt-8 lg:px-8 lg:pt-12">
+      <header className="mb-10 lg:mb-14 iv">
+        <p className="eyebrow eyebrow-rule">Catalog</p>
+        <h1 className="display-1 mt-4 font-medium">All products.</h1>
+        <p className="mt-4 max-w-2xl text-base text-[var(--color-fg-muted)] leading-relaxed">
+          <span className="text-[var(--color-fg)] font-medium">
+            {result.total}
+          </span>{" "}
+          products curated for designers, architects, and contract buyers.
           Click any item to enquire on WhatsApp.
         </p>
       </header>
