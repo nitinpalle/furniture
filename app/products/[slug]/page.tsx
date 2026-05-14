@@ -130,12 +130,13 @@ export default async function ProductPage({ params }: { params: Params }) {
       </nav>
 
       {/* ============== DESKTOP TITLE (above gallery) ============== */}
-      <header className="mx-auto hidden max-w-7xl px-4 lg:block lg:px-8 lg:pt-5">
-        <h1 className="font-[var(--font-display)] text-balance text-3xl font-medium tracking-tight lg:text-4xl">
-          {product.name}
-        </h1>
+      <header className="mx-auto hidden max-w-7xl px-4 lg:block lg:px-8 lg:pt-6">
+        {product.series?.name && (
+          <p className="eyebrow mb-3">{product.series.name}</p>
+        )}
+        <h1 className="display-2 font-medium">{product.name}</h1>
         {summaryBits.length > 0 && (
-          <p className="text-[var(--color-fg-muted)] mt-1 text-sm">
+          <p className="mt-2 text-sm text-[var(--color-fg-muted)]">
             {summaryBits.join(" · ")}
           </p>
         )}
@@ -195,25 +196,23 @@ export default async function ProductPage({ params }: { params: Params }) {
         )}
 
       {/* ============== TWO-COLUMN: details (60%) + sticky inquiry card (40%) ============== */}
-      <section className="mx-auto max-w-7xl px-5 pb-20 pt-8 lg:px-8 lg:pb-16 lg:pt-10">
+      <section className="mx-auto max-w-7xl px-5 pb-20 pt-8 lg:px-8 lg:pb-16 lg:pt-12">
         <div className="lg:grid lg:grid-cols-[3fr_2fr] lg:gap-12 xl:gap-16">
           {/* LEFT — description, project chips, specs, expandable sections */}
-          <div className="space-y-8 lg:space-y-10">
+          <div className="space-y-10 lg:space-y-12">
             {/* Description */}
-            <section className="space-y-3">
-              <h2 className="text-[var(--color-fg-subtle)] text-[11px] font-semibold uppercase tracking-widest lg:text-base lg:tracking-normal lg:text-[var(--color-fg)] lg:normal-case">
-                Description
-              </h2>
+            <section className="space-y-3 iv">
+              <p className="eyebrow">Description</p>
               {product.description ? (
-                <p className="text-[var(--color-fg-muted)] text-sm leading-relaxed lg:text-base">
+                <p className="text-[15px] leading-relaxed text-[var(--color-fg-muted)] lg:text-base">
                   {product.description}
                 </p>
               ) : (
-                <div className="border-[var(--color-border)] bg-[var(--color-bg-elevated)] rounded-lg border p-4">
-                  <p className="text-[var(--color-fg-muted)] text-sm">
+                <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4">
+                  <p className="text-sm text-[var(--color-fg-muted)]">
                     Product description coming soon. For full specs, finishes,
                     and trade pricing,{" "}
-                    <span className="text-[var(--color-fg)] font-medium">
+                    <span className="font-medium text-[var(--color-fg)]">
                       enquire on WhatsApp
                     </span>{" "}
                     using the panel{" "}
@@ -226,16 +225,18 @@ export default async function ProductPage({ params }: { params: Params }) {
 
             {/* Designed for / project chips */}
             {product.project_types && product.project_types.length > 0 && (
-              <section className="space-y-3">
-                <h2 className="text-[var(--color-fg-subtle)] text-[11px] font-semibold uppercase tracking-widest lg:text-base lg:tracking-normal lg:text-[var(--color-fg)] lg:normal-case">
-                  Designed for
-                </h2>
+              <section className="space-y-3 iv">
+                <p className="eyebrow">Designed for</p>
                 <div className="flex flex-wrap gap-2">
                   {product.project_types.map((pt) => (
                     <Link
                       key={pt}
                       href={`/products?project=${pt}`}
-                      className="border-[var(--color-border-strong)] hover:border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)] inline-flex items-center rounded-full border px-4 py-1.5 text-xs font-medium transition-colors"
+                      className={cn(
+                        "inline-flex items-center rounded-full border border-[var(--color-border-strong)] px-4 py-1.5 text-xs font-medium",
+                        "transition-[color,background-color,border-color,transform] duration-[var(--duration-fast)]",
+                        "hover:-translate-y-0.5 hover:border-[var(--color-fg)] hover:bg-[var(--color-fg)] hover:text-[var(--color-bg)]",
+                      )}
                     >
                       {PROJECT_LABELS[pt] ?? pt}
                     </Link>
@@ -245,22 +246,27 @@ export default async function ProductPage({ params }: { params: Params }) {
             )}
 
             {/* Key attributes */}
-            <SpecsList
-              specs={{
-                sku: product.sku,
-                dimensions: product.dimensions,
-                capacity: product.capacity,
-                material: product.material,
-                color: product.color,
-                countryOfOrigin: product.country_of_origin,
-                moq: product.moq,
-                leadTimeDays: product.lead_time_days,
-                series: product.series?.name ?? null,
-              }}
-            />
+            <div className="iv">
+              <p className="eyebrow mb-4">Key attributes</p>
+              <SpecsList
+                hideHeading
+                specs={{
+                  sku: product.sku,
+                  dimensions: product.dimensions,
+                  capacity: product.capacity,
+                  material: product.material,
+                  color: product.color,
+                  countryOfOrigin: product.country_of_origin,
+                  moq: product.moq,
+                  leadTimeDays: product.lead_time_days,
+                  series: product.series?.name ?? null,
+                }}
+              />
+            </div>
 
             {/* Expandable sections */}
-            <section>
+            <section className="iv">
+              <p className="eyebrow mb-2">More details</p>
               <ExpandableSection title="Materials & care">
                 <p>
                   {product.material
@@ -319,12 +325,14 @@ export default async function ProductPage({ params }: { params: Params }) {
       {similar.length > 0 && (
         <section
           className={cn(
-            "border-[var(--color-border)] border-y bg-[var(--color-bg-elevated)]",
-            "py-14 lg:py-20",
+            "hairline-t hairline-b bg-[var(--color-bg-elevated)]",
+            "py-16 lg:py-24",
           )}
         >
           <div className="mx-auto max-w-7xl px-4 lg:px-8">
-            <SimilarProducts products={similar} heading="Similar products" />
+            <div className="iv">
+              <SimilarProducts products={similar} heading="Similar products" />
+            </div>
           </div>
         </section>
       )}

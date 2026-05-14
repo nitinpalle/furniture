@@ -8,6 +8,14 @@ type ProductGridProps = {
   className?: string;
   /** Render a "no results" empty state when products is empty. Defaults to true. */
   showEmpty?: boolean;
+  /**
+   * When true, each card mounts with a staggered fade-up reveal
+   * (relies on globals.css .iv + .iv-stagger and the InViewReveal hook).
+   * Defaults to true; pass false for grids that should appear instantly
+   * (e.g. loaded inside a paginated/filterable surface where the user
+   * triggered the change themselves).
+   */
+  reveal?: boolean;
 };
 
 /**
@@ -19,18 +27,17 @@ export function ProductGrid({
   source,
   className,
   showEmpty = true,
+  reveal = true,
 }: ProductGridProps) {
   if (products.length === 0) {
     if (!showEmpty) return null;
     return (
-      <div className="border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] flex flex-col items-center justify-center rounded-lg border-2 border-dashed py-20 text-center">
-        <p className="text-[var(--color-fg-subtle)] text-xs font-mono uppercase tracking-widest">
-          No products
-        </p>
-        <h2 className="font-[var(--font-display)] mt-2 text-xl font-medium">
+      <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)] py-20 text-center">
+        <p className="eyebrow-muted">No products</p>
+        <h2 className="mt-3 font-[var(--font-display)] text-xl font-medium">
           Nothing matches yet.
         </h2>
-        <p className="text-[var(--color-fg-muted)] mt-2 max-w-sm text-sm">
+        <p className="mt-2 max-w-sm text-sm text-[var(--color-fg-muted)]">
           Try removing a filter, clearing the search, or browsing all products.
         </p>
       </div>
@@ -44,11 +51,17 @@ export function ProductGrid({
         "grid-cols-2",
         "md:grid-cols-3",
         "lg:grid-cols-4",
+        reveal && "iv-stagger",
         className,
       )}
     >
       {products.map((p) => (
-        <ProductCard key={p.id} product={p} source={source} />
+        <ProductCard
+          key={p.id}
+          product={p}
+          source={source}
+          className={reveal ? "iv" : undefined}
+        />
       ))}
     </div>
   );

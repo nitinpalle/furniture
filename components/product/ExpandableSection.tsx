@@ -23,35 +23,44 @@ export function ExpandableSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-[var(--color-border)] border-b">
+    <div className="border-b border-[var(--color-border)]">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className={cn(
-          "text-[var(--color-fg)] flex w-full items-center justify-between py-4 text-left text-base font-semibold",
-          "hover:text-[var(--color-accent)] transition-colors",
+          "flex w-full items-center justify-between py-4 text-left text-base font-medium",
+          "text-[var(--color-fg)] transition-colors duration-[var(--duration-fast)]",
+          "hover:text-[var(--color-accent)]",
+          "focus-visible:outline-none focus-visible:text-[var(--color-accent)]",
         )}
       >
-        {title}
+        <span className="font-[var(--font-display)] tracking-tight">
+          {title}
+        </span>
         <ChevronDown
           className={cn(
-            "text-[var(--color-fg-muted)] h-4 w-4 shrink-0 transition-transform duration-200",
-            open && "rotate-180",
+            "h-4 w-4 shrink-0 text-[var(--color-fg-muted)]",
+            "transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-expo)]",
+            open && "rotate-180 text-[var(--color-accent)]",
           )}
           aria-hidden
         />
       </button>
       <div
         className={cn(
-          "grid overflow-hidden transition-all duration-300",
-          open
-            ? "grid-rows-[1fr] opacity-100 pb-4"
-            : "grid-rows-[0fr] opacity-0",
+          "grid overflow-hidden transition-[grid-template-rows,opacity] duration-[var(--duration-base)] ease-[var(--ease-out-expo)]",
+          open ? "grid-rows-[1fr] opacity-100 pb-5" : "grid-rows-[0fr] opacity-0",
         )}
       >
         <div className="min-h-0">
-          <div className="text-[var(--color-fg-muted)] text-sm leading-relaxed">
+          <div
+            className={cn(
+              "text-sm leading-relaxed text-[var(--color-fg-muted)]",
+              "transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-expo)]",
+              open ? "translate-y-0" : "-translate-y-1",
+            )}
+          >
             {children}
           </div>
         </div>

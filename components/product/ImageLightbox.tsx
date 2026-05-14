@@ -86,8 +86,8 @@ export function ImageLightbox({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[80] bg-black/95"
+          transition={{ duration: 0.32, ease: [0.2, 0.7, 0.1, 1] }}
+          className="fixed inset-0 z-[80] bg-black/95 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label="Image gallery"
@@ -129,9 +129,13 @@ export function ImageLightbox({
                   }}
                 >
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.96 }}
+                    initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.25, delay: i === initialIndex ? 0 : 0.04 }}
+                    transition={{
+                      duration: 0.45,
+                      ease: [0.2, 0.7, 0.1, 1],
+                      delay: i === initialIndex ? 0.08 : 0.04,
+                    }}
                     className="relative h-full w-full"
                     style={{ touchAction: "pinch-zoom" }}
                   >

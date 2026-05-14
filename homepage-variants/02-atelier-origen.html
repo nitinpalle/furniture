@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Atelier Origen — Variant 02 (Showroom Walkthrough)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: { charcoal:'#1F1F1F', bone:'#EDE7DD', cream:'#F6F1E8', brass:'#B8945F', muted:'#7A746A', dark:'#0F0F0F' },
+      fontFamily: { display: ['Fraunces','serif'], sans: ['Inter','sans-serif'] },
+    }}
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background:#0F0F0F; color:#EDE7DD; font-family: Inter, sans-serif; }
+
+  /* Cursor */
+  .cursor { position: fixed; width: 70px; height: 70px; border:1px solid rgba(184,148,95,.6); border-radius:50%; pointer-events:none; transform: translate(-50%,-50%); transition: transform .25s ease, width .3s, height .3s; z-index: 100; mix-blend-mode: difference; }
+  .cursor-dot { position: fixed; width: 4px; height: 4px; background: #B8945F; border-radius:50%; pointer-events:none; transform: translate(-50%,-50%); z-index: 101; }
+  @media (hover: none) { .cursor, .cursor-dot { display:none; } }
+
+  /* Hero scene crossfade */
+  .scene { position:absolute; inset:0; opacity:0; transition: opacity 1.4s ease; }
+  .scene.active { opacity:1; }
+  .scene img { width:100%; height:100%; object-fit:cover; transform: scale(1.06); transition: transform 8s ease; }
+  .scene.active img { transform: scale(1.0); }
+
+  /* Horizontal scroll showroom */
+  .room-track { display:flex; gap: 1.5rem; }
+  .room { flex: 0 0 80vw; max-width: 1100px; height: 80vh; min-height: 560px; position: relative; overflow:hidden; border-radius: 4px; }
+  @media (min-width: 1024px) { .room { flex-basis: 70vw; } }
+
+  /* Hotspot pulse */
+  .hotspot { position:absolute; width:36px; height:36px; border-radius:50%; background: rgba(184,148,95,.15); border:1px solid #B8945F; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .hotspot::before { content:''; position:absolute; inset:-6px; border:1px solid rgba(184,148,95,.4); border-radius:50%; animation: pulse 2.4s ease-out infinite; }
+  .hotspot::after { content:''; width:8px; height:8px; background:#B8945F; border-radius:50%; }
+  @keyframes pulse { 0%{ transform: scale(.8); opacity: 1;} 100%{ transform: scale(2); opacity: 0;} }
+  .hotspot-card { position:absolute; bottom: 100%; left: 50%; transform: translate(-50%, -10px); width: 240px; background: #0F0F0F; border:1px solid rgba(237,231,221,.15); padding: 14px; opacity:0; pointer-events:none; transition: opacity .25s, transform .25s; }
+  .hotspot:hover .hotspot-card, .hotspot:focus .hotspot-card { opacity:1; transform: translate(-50%, -16px); pointer-events:auto; }
+
+  /* Reveal */
+  .iv { opacity:0; transform: translateY(28px); transition: opacity 1s ease, transform 1s cubic-bezier(.2,.7,.1,1); }
+  .iv.in { opacity:1; transform:none; }
+
+  /* Magnetic button hover */
+  .magnetic { position: relative; transition: transform .25s ease; }
+  .magnetic:hover { transform: translateY(-2px); }
+
+  /* Vertical ticker for hero side */
+  .ticker { writing-mode: vertical-rl; transform: rotate(180deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scene img { transition: none; transform:none; }
+    .hotspot::before { animation:none; }
+  }
+</style>
+</head>
+<body class="antialiased">
+
+<div class="cursor"></div>
+<div class="cursor-dot"></div>
+
+<!-- ============== TOP BAR ============== -->
+<header class="fixed top-0 inset-x-0 z-50 mix-blend-difference text-bone">
+  <div class="max-w-[1500px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+    <a href="#" class="font-display text-xl tracking-[0.04em]">ATELIER · ORIGEN</a>
+    <nav class="hidden md:flex items-center gap-10 text-[11px] uppercase tracking-[0.22em]">
+      <a href="#showroom" class="hover:text-brass transition">Showroom</a>
+      <a href="#categories" class="hover:text-brass transition">Catalog</a>
+      <a href="#process" class="hover:text-brass transition">Process</a>
+      <a href="#enquire" class="hover:text-brass transition">Trade</a>
+    </nav>
+    <a href="#enquire" class="text-[11px] uppercase tracking-[0.22em] border border-current px-4 py-2">Enquire</a>
+  </div>
+</header>
+
+<!-- ============== HERO (cross-fade scenes) ============== -->
+<section class="relative h-screen w-full overflow-hidden">
+  <div class="scene active"><img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=2200&q=85&auto=format&fit=crop" alt=""></div>
+  <div class="scene"><img src="https://images.unsplash.com/photo-1604578762246-41134e37f9cc?w=2200&q=85&auto=format&fit=crop" alt=""></div>
+  <div class="scene"><img src="https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=2200&q=85&auto=format&fit=crop" alt=""></div>
+  <div class="scene"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=2200&q=85&auto=format&fit=crop" alt=""></div>
+
+  <div class="absolute inset-0 bg-gradient-to-b from-charcoal/30 via-charcoal/20 to-charcoal/80"></div>
+
+  <div class="relative z-10 h-full max-w-[1500px] mx-auto px-6 lg:px-12 flex flex-col justify-end pb-24 lg:pb-32">
+    <div class="flex items-end justify-between">
+      <div class="max-w-3xl">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-6">An invitation to wander</p>
+        <h1 class="font-display font-light text-[clamp(2.4rem,7vw,7rem)] leading-[0.95] tracking-[-0.02em] text-bone">
+          Step into the<br><em class="font-normal">showroom.</em>
+        </h1>
+        <div class="mt-10 flex flex-wrap items-center gap-6">
+          <a href="#showroom" class="magnetic inline-flex items-center gap-3 bg-brass text-charcoal px-7 py-3.5 text-[12px] uppercase tracking-[0.24em] font-medium">Begin the tour
+            <svg width="22" height="10" viewBox="0 0 22 10" fill="none"><path d="M0 5h20M16 1l4 4-4 4" stroke="currentColor"/></svg>
+          </a>
+          <a href="#enquire" class="text-[11px] uppercase tracking-[0.24em] hover:text-brass transition">Trade access →</a>
+        </div>
+      </div>
+      <div class="hidden lg:block text-right text-[10px] uppercase tracking-[0.3em] text-bone/60 max-w-[180px]">
+        Living · Dining · Bedroom · Office · Outdoor — four scenes, six rooms, one catalog.
+      </div>
+    </div>
+    <!-- Scene indicator -->
+    <div class="mt-14 flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-bone/60">
+      <span class="dot-active w-8 h-px bg-brass"></span>
+      <span class="w-8 h-px bg-bone/30"></span>
+      <span class="w-8 h-px bg-bone/30"></span>
+      <span class="w-8 h-px bg-bone/30"></span>
+      <span class="ml-3" id="sceneLabel">01 / Living</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============== INTRO ============== -->
+<section class="bg-charcoal py-32 lg:py-44">
+  <div class="max-w-[1100px] mx-auto px-6 lg:px-12 grid lg:grid-cols-12 gap-10 items-end">
+    <p class="lg:col-span-3 text-[11px] uppercase tracking-[0.3em] text-brass iv">A studio without walls.</p>
+    <h2 class="lg:col-span-9 font-display font-light text-3xl lg:text-5xl leading-[1.15] iv">
+      Origen is a contract furniture house for projects that read like rooms — not warehouses. Eight countries of provenance, one curator, every piece specified for the way you'll actually live in it.
+    </h2>
+  </div>
+</section>
+
+<!-- ============== HORIZONTAL SHOWROOM ============== -->
+<section id="showroom" class="bg-dark py-24 lg:py-32 overflow-hidden">
+  <div class="max-w-[1500px] mx-auto px-6 lg:px-12 mb-16 flex items-end justify-between iv">
+    <div>
+      <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-3">The Showroom</p>
+      <h2 class="font-display font-light text-4xl lg:text-6xl tracking-tight">Walk through four rooms.</h2>
+    </div>
+    <p class="hidden md:block text-[11px] uppercase tracking-[0.24em] text-muted">Drag · Scroll · Tap a piece</p>
+  </div>
+
+  <div class="overflow-x-auto pb-10 px-6 lg:px-12 snap-x snap-mandatory" id="track">
+    <div class="room-track">
+      <!-- Room 1 -->
+      <div class="room snap-center">
+        <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=2000&q=85&auto=format&fit=crop" class="w-full h-full object-cover" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+        <div class="absolute top-6 left-6 text-[10px] uppercase tracking-[0.3em] text-bone/80">№ 01 / Living</div>
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+          <h3 class="font-display text-3xl lg:text-5xl text-bone">The Living Room.</h3>
+          <a href="#" class="text-[11px] uppercase tracking-[0.24em] text-bone hover:text-brass">View pieces →</a>
+        </div>
+        <div class="hotspot" style="top:55%; left:32%;">
+          <div class="hotspot-card text-bone">
+            <p class="text-[10px] uppercase tracking-[0.24em] text-brass mb-1">Vela Sofa</p>
+            <p class="font-display text-base">Boucle, oak frame</p>
+            <p class="text-[11px] text-muted mt-2">3-seat · Made in Porto</p>
+          </div>
+        </div>
+        <div class="hotspot" style="top:62%; left:62%;">
+          <div class="hotspot-card text-bone">
+            <p class="text-[10px] uppercase tracking-[0.24em] text-brass mb-1">Ostra Coffee Table</p>
+            <p class="font-display text-base">Solid walnut</p>
+            <p class="text-[11px] text-muted mt-2">Made in Yogyakarta</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room 2 -->
+      <div class="room snap-center">
+        <img src="https://images.unsplash.com/photo-1567016526105-22da7c13161a?w=2000&q=85&auto=format&fit=crop" class="w-full h-full object-cover" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+        <div class="absolute top-6 left-6 text-[10px] uppercase tracking-[0.3em] text-bone/80">№ 02 / Dining</div>
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+          <h3 class="font-display text-3xl lg:text-5xl text-bone">The Dining Room.</h3>
+          <a href="#" class="text-[11px] uppercase tracking-[0.24em] text-bone hover:text-brass">View pieces →</a>
+        </div>
+        <div class="hotspot" style="top:50%; left:48%;">
+          <div class="hotspot-card text-bone">
+            <p class="text-[10px] uppercase tracking-[0.24em] text-brass mb-1">Halden Refectory</p>
+            <p class="font-display text-base">Single-slab walnut, 3.6m</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room 3 -->
+      <div class="room snap-center">
+        <img src="https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=2000&q=85&auto=format&fit=crop" class="w-full h-full object-cover" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+        <div class="absolute top-6 left-6 text-[10px] uppercase tracking-[0.3em] text-bone/80">№ 03 / Bedroom</div>
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+          <h3 class="font-display text-3xl lg:text-5xl text-bone">The Bedroom.</h3>
+          <a href="#" class="text-[11px] uppercase tracking-[0.24em] text-bone hover:text-brass">View pieces →</a>
+        </div>
+        <div class="hotspot" style="top:58%; left:42%;">
+          <div class="hotspot-card text-bone">
+            <p class="text-[10px] uppercase tracking-[0.24em] text-brass mb-1">Solea Bed</p>
+            <p class="font-display text-base">Linen-upholstered, oak</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room 4 -->
+      <div class="room snap-center">
+        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=2000&q=85&auto=format&fit=crop" class="w-full h-full object-cover" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+        <div class="absolute top-6 left-6 text-[10px] uppercase tracking-[0.3em] text-bone/80">№ 04 / Office</div>
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+          <h3 class="font-display text-3xl lg:text-5xl text-bone">The Studio.</h3>
+          <a href="#" class="text-[11px] uppercase tracking-[0.24em] text-bone hover:text-brass">View pieces →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== CATEGORIES ============== -->
+<section id="categories" class="bg-charcoal py-28 lg:py-36">
+  <div class="max-w-[1500px] mx-auto px-6 lg:px-12">
+    <div class="flex items-end justify-between mb-14 iv">
+      <div>
+        <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-3">The Catalog</p>
+        <h2 class="font-display font-light text-4xl lg:text-6xl">Six rooms, fully resolved.</h2>
+      </div>
+      <a href="#" class="hidden md:inline-block text-[11px] uppercase tracking-[0.24em] text-bone/70 hover:text-brass">All categories →</a>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+      <a href="#" class="group relative aspect-[4/5] overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=900&q=80&auto=format&fit=crop" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+        <div class="absolute inset-x-5 bottom-5">
+          <p class="text-[10px] uppercase tracking-[0.3em] text-brass">№ 01</p>
+          <h3 class="font-display text-2xl lg:text-3xl text-bone mt-1">Living Room</h3>
+          <p class="text-[11px] text-bone/60 mt-1">Sofas · Lounge chairs · Tables</p>
+        </div>
+      </a>
+      <a href="#" class="group relative aspect-[4/5] overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1567016526105-22da7c13161a?w=900&q=80&auto=format&fit=crop" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+        <div class="absolute inset-x-5 bottom-5">
+          <p class="text-[10px] uppercase tracking-[0.3em] text-brass">№ 02</p>
+          <h3 class="font-display text-2xl lg:text-3xl text-bone mt-1">Dining</h3>
+          <p class="text-[11px] text-bone/60 mt-1">Tables · Chairs · Sideboards</p>
+        </div>
+      </a>
+      <a href="#" class="group relative aspect-[4/5] overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=900&q=80&auto=format&fit=crop" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+        <div class="absolute inset-x-5 bottom-5">
+          <p class="text-[10px] uppercase tracking-[0.3em] text-brass">№ 03</p>
+          <h3 class="font-display text-2xl lg:text-3xl text-bone mt-1">Bedroom</h3>
+          <p class="text-[11px] text-bone/60 mt-1">Beds · Nightstands · Wardrobes</p>
+        </div>
+      </a>
+      <a href="#" class="group relative aspect-[4/5] overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&q=80&auto=format&fit=crop" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+        <div class="absolute inset-x-5 bottom-5">
+          <p class="text-[10px] uppercase tracking-[0.3em] text-brass">№ 04</p>
+          <h3 class="font-display text-2xl lg:text-3xl text-bone mt-1">Office</h3>
+          <p class="text-[11px] text-bone/60 mt-1">Desks · Task chairs · Lounge</p>
+        </div>
+      </a>
+      <a href="#" class="group relative aspect-[4/5] overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80&auto=format&fit=crop" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+        <div class="absolute inset-x-5 bottom-5">
+          <p class="text-[10px] uppercase tracking-[0.3em] text-brass">№ 05</p>
+          <h3 class="font-display text-2xl lg:text-3xl text-bone mt-1">Outdoor</h3>
+          <p class="text-[11px] text-bone/60 mt-1">Lounges · Dining · Sun</p>
+        </div>
+      </a>
+      <a href="#" class="group relative aspect-[4/5] overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1616627988464-8b58e8e9adcf?w=900&q=80&auto=format&fit=crop" alt="">
+        <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+        <div class="absolute inset-x-5 bottom-5">
+          <p class="text-[10px] uppercase tracking-[0.3em] text-brass">№ 06</p>
+          <h3 class="font-display text-2xl lg:text-3xl text-bone mt-1">Storage</h3>
+          <p class="text-[11px] text-bone/60 mt-1">Cabinets · Consoles · Shelving</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============== PROCESS ============== -->
+<section id="process" class="bg-dark py-28 lg:py-36">
+  <div class="max-w-[1300px] mx-auto px-6 lg:px-12">
+    <div class="iv mb-16">
+      <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-3">From sketch to site</p>
+      <h2 class="font-display font-light text-4xl lg:text-5xl">Four steps. One consignment.</h2>
+    </div>
+    <div class="grid md:grid-cols-4 gap-8 lg:gap-10">
+      <div class="iv border-t border-bone/15 pt-6">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-3">01</p>
+        <h3 class="font-display text-xl mb-2">Tell us your scope</h3>
+        <p class="text-sm text-muted leading-relaxed">Project type, room counts, deadlines. We listen first.</p>
+      </div>
+      <div class="iv border-t border-bone/15 pt-6">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-3">02</p>
+        <h3 class="font-display text-xl mb-2">Receive a curated edit</h3>
+        <p class="text-sm text-muted leading-relaxed">A bespoke catalog within one business day.</p>
+      </div>
+      <div class="iv border-t border-bone/15 pt-6">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-3">03</p>
+        <h3 class="font-display text-xl mb-2">Specify and approve</h3>
+        <p class="text-sm text-muted leading-relaxed">Materials, finishes, dimensions — confirmed in writing.</p>
+      </div>
+      <div class="iv border-t border-bone/15 pt-6">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-3">04</p>
+        <h3 class="font-display text-xl mb-2">One tracked consignment</h3>
+        <p class="text-sm text-muted leading-relaxed">Cleared, delivered, white-glove installed on site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ENQUIRE ============== -->
+<section id="enquire" class="relative bg-charcoal py-32 lg:py-44 overflow-hidden">
+  <img class="absolute inset-0 w-full h-full object-cover opacity-25" src="https://images.unsplash.com/photo-1604014237800-1c9102c219da?w=2000&q=80&auto=format&fit=crop" alt="">
+  <div class="absolute inset-0 bg-gradient-to-b from-charcoal/80 via-charcoal/60 to-charcoal"></div>
+  <div class="relative max-w-[1100px] mx-auto px-6 lg:px-12 text-center">
+    <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-5 iv">Begin a project</p>
+    <h2 class="font-display font-light text-5xl lg:text-7xl leading-[1.02] iv">
+      Tell us what you're<br><em class="font-normal">building.</em>
+    </h2>
+    <p class="mt-6 max-w-xl mx-auto text-bone/70 iv">No forms. No follow-ups. Just a curated catalog over WhatsApp, within a business day.</p>
+    <a href="#" class="mt-12 inline-flex items-center gap-3 bg-brass text-charcoal px-8 py-4 text-[12px] uppercase tracking-[0.24em] font-medium magnetic iv">
+      Request a curated catalog
+      <svg width="20" height="10" viewBox="0 0 22 10" fill="none"><path d="M0 5h20M16 1l4 4-4 4" stroke="currentColor"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ============== FOOTER ============== -->
+<footer class="bg-dark border-t border-bone/10 py-14">
+  <div class="max-w-[1500px] mx-auto px-6 lg:px-12 grid md:grid-cols-4 gap-10">
+    <div class="md:col-span-2">
+      <p class="font-display text-2xl">ATELIER · ORIGEN</p>
+      <p class="mt-4 text-sm text-muted max-w-sm">Contract furniture for India's most considered interiors.</p>
+    </div>
+    <div>
+      <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-4">Showroom</p>
+      <ul class="space-y-2 text-sm text-bone/80"><li><a href="#">Living</a></li><li><a href="#">Dining</a></li><li><a href="#">Bedroom</a></li><li><a href="#">Office</a></li></ul>
+    </div>
+    <div>
+      <p class="text-[11px] uppercase tracking-[0.3em] text-brass mb-4">Atelier</p>
+      <ul class="space-y-2 text-sm text-bone/80"><li><a href="#">About</a></li><li><a href="#">Process</a></li><li><a href="#">Trade</a></li><li><a href="#">Contact</a></li></ul>
+    </div>
+  </div>
+  <div class="border-t border-bone/10 mt-10 pt-5 text-center text-[10px] uppercase tracking-[0.3em] text-muted">© Atelier Origen · Mumbai</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const c = document.querySelector('.cursor');
+  const d = document.querySelector('.cursor-dot');
+  let mx=0,my=0,cx=0,cy=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; d.style.left=mx+'px'; d.style.top=my+'px'; });
+  function loop(){ cx += (mx-cx)*.15; cy += (my-cy)*.15; c.style.left=cx+'px'; c.style.top=cy+'px'; requestAnimationFrame(loop); } loop();
+
+  // Hero scene crossfade
+  const scenes = document.querySelectorAll('.scene');
+  const labels = ['01 / Living','02 / Dining','03 / Bedroom','04 / Office'];
+  const dots = document.querySelectorAll('.dot-active, [class*="bg-bone/30"]');
+  let idx = 0;
+  setInterval(()=>{
+    scenes[idx].classList.remove('active');
+    idx = (idx+1) % scenes.length;
+    scenes[idx].classList.add('active');
+    document.getElementById('sceneLabel').textContent = labels[idx];
+  }, 4500);
+
+  // In-view
+  const io = new IntersectionObserver((es)=>es.forEach(e => e.isIntersecting && (e.target.classList.add('in'), io.unobserve(e.target))), { threshold: 0.12 });
+  document.querySelectorAll('.iv').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
