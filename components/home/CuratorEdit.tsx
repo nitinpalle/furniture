@@ -7,7 +7,6 @@ import type { ProductCardData } from "@/lib/products";
 
 type EditEntry = ProductCardData & {
   number: string;
-  caption?: string;
 };
 
 type CuratorEditProps = {
@@ -16,19 +15,13 @@ type CuratorEditProps = {
 
 /**
  * Four-piece vertical editorial showcase. Each row alternates image-left /
- * image-right and feels like a single magazine spread per product:
- *
- *   ┌───────────┐  № 04
- *   │  IMAGE    │  Halden Refectory Table.
- *   │           │  ── data callouts ──
- *   └───────────┘  Enquire about this piece →
- *
- * Pulls live data from `getFeaturedProducts` so this stays in sync with
- * what's actually in the catalog.
+ * image-right and shows real product data only — no fabricated captions.
+ * Data callouts (made in, dimensions, capacity, sku) come directly from
+ * the catalog.
  */
 export function CuratorEdit({ entries }: CuratorEditProps) {
   return (
-    <ul className="iv-stagger flex flex-col gap-20 lg:gap-32">
+    <ul className="iv-stagger flex flex-col gap-14 lg:gap-20">
       {entries.map((p, i) => {
         const cover = p.image_urls?.[0];
         const flag = flagFor(p.country_of_origin);
@@ -38,7 +31,7 @@ export function CuratorEdit({ entries }: CuratorEditProps) {
           <li key={p.id} className="iv">
             <article
               className={cn(
-                "grid items-center gap-8 lg:grid-cols-2 lg:gap-16",
+                "grid items-center gap-8 lg:grid-cols-2 lg:gap-12",
                 reverse && "lg:[&>*:first-child]:order-2",
               )}
             >
@@ -52,7 +45,7 @@ export function CuratorEdit({ entries }: CuratorEditProps) {
                     src={cover}
                     alt={p.name}
                     fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    sizes="(max-width: 1024px) 100vw, 45vw"
                     className="object-cover transition-transform duration-[1.4s] ease-[var(--ease-out-expo)] group-hover/edit:scale-[1.04]"
                   />
                 ) : (
@@ -66,26 +59,21 @@ export function CuratorEdit({ entries }: CuratorEditProps) {
 
               {/* Content */}
               <div className="lg:px-2">
-                <p className="font-[var(--font-display)] text-2xl font-light tabular-nums text-[var(--color-fg-subtle)] lg:text-3xl">
+                <p className="font-[var(--font-display)] text-lg font-light tabular-nums text-[var(--color-fg-subtle)] lg:text-xl">
                   {p.number}
                 </p>
-                <h3 className="mt-3 font-[var(--font-display)] text-3xl font-light leading-[1.05] tracking-tight md:text-4xl lg:text-5xl">
+                <h3 className="mt-2 font-[var(--font-display)] text-2xl font-light leading-[1.06] tracking-tight md:text-3xl lg:text-[2.25rem]">
                   {p.name}.
                 </h3>
-                {p.caption && (
-                  <p className="mt-5 max-w-md text-base leading-relaxed text-[var(--color-fg-muted)]">
-                    {p.caption}
-                  </p>
-                )}
 
-                {/* Data callouts */}
-                <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-[var(--color-border)] pt-6 max-w-md">
+                {/* Data callouts — real product data only */}
+                <dl className="mt-7 grid max-w-md grid-cols-2 gap-x-6 gap-y-4 border-t border-[var(--color-border)] pt-5">
                   {p.country_of_origin && (
                     <div>
                       <dt className="text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-subtle)]">
                         Made in
                       </dt>
-                      <dd className="mt-1.5 text-sm font-medium">
+                      <dd className="mt-1 text-sm font-medium">
                         {flag && <span className="mr-1.5" aria-hidden>{flag}</span>}
                         {p.country_of_origin}
                       </dd>
@@ -96,7 +84,7 @@ export function CuratorEdit({ entries }: CuratorEditProps) {
                       <dt className="text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-subtle)]">
                         Dimensions
                       </dt>
-                      <dd className="mt-1.5 text-sm font-medium">
+                      <dd className="mt-1 text-sm font-medium">
                         {p.dimensions}
                       </dd>
                     </div>
@@ -106,7 +94,7 @@ export function CuratorEdit({ entries }: CuratorEditProps) {
                       <dt className="text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-subtle)]">
                         Capacity
                       </dt>
-                      <dd className="mt-1.5 text-sm font-medium">{p.capacity}</dd>
+                      <dd className="mt-1 text-sm font-medium">{p.capacity}</dd>
                     </div>
                   )}
                   {p.sku && (
@@ -114,7 +102,7 @@ export function CuratorEdit({ entries }: CuratorEditProps) {
                       <dt className="text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-subtle)]">
                         Sku
                       </dt>
-                      <dd className="mt-1.5 font-mono text-sm font-medium">
+                      <dd className="mt-1 font-mono text-sm font-medium">
                         {p.sku}
                       </dd>
                     </div>
@@ -124,12 +112,12 @@ export function CuratorEdit({ entries }: CuratorEditProps) {
                 <Link
                   href={`/products/${p.slug}`}
                   className={cn(
-                    "mt-8 inline-flex items-center gap-2 text-[12px] uppercase tracking-[0.22em] uline",
+                    "uline mt-7 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em]",
                     "transition-colors duration-[var(--duration-fast)]",
                     "hover:text-[var(--color-accent)]",
                   )}
                 >
-                  Enquire about this piece
+                  View piece
                   <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
                 </Link>
               </div>

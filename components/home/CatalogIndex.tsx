@@ -19,12 +19,12 @@ type CatalogIndexProps = {
 /**
  * The Index — the homepage centerpiece.
  *
- * Reads like the table of contents of a print catalog: large display number,
+ * Reads like the table of contents of a print catalog: numbered serial,
  * category name in serif, descriptor in mono, count + arrow on the right.
- * On lg+ a small product image fades in to the right of the row on hover.
+ * On xl+ a small product thumbnail fades in to the right of the row on hover.
  *
- * Rendered as a server component; the row hover is pure CSS so nothing
- * touches the React tree as the user moves through the list.
+ * Sized tightly on desktop so the page doesn't require excessive scrolling
+ * — the entire Index fits comfortably above the fold on a typical 1440 view.
  */
 export function CatalogIndex({ rows }: CatalogIndexProps) {
   return (
@@ -34,13 +34,13 @@ export function CatalogIndex({ rows }: CatalogIndexProps) {
           <Link
             href={`/categories/${row.slug}`}
             className={cn(
-              "group/row relative grid grid-cols-[auto_1fr_auto] items-center gap-6 py-6 md:py-8 lg:grid-cols-[7rem_1fr_auto_3rem] lg:gap-8 lg:py-10",
+              "group/row relative grid grid-cols-[auto_1fr_auto] items-center gap-5 py-5 md:gap-7 md:py-6 lg:grid-cols-[5rem_1fr_auto_3rem] lg:gap-8 lg:py-7",
               "transition-colors duration-[var(--duration-base)] ease-[var(--ease-out-expo)]",
               "hover:bg-[var(--color-bg-elevated)]",
             )}
           >
             {/* Number */}
-            <span className="font-[var(--font-display)] text-2xl font-light tracking-tight text-[var(--color-fg-subtle)] tabular-nums md:text-3xl lg:text-4xl">
+            <span className="font-[var(--font-display)] text-xl font-light tracking-tight text-[var(--color-fg-subtle)] tabular-nums md:text-2xl">
               {row.number}
             </span>
 
@@ -48,21 +48,21 @@ export function CatalogIndex({ rows }: CatalogIndexProps) {
             <div className="min-w-0">
               <h3
                 className={cn(
-                  "font-[var(--font-display)] text-3xl font-light leading-[1.04] tracking-tight md:text-4xl lg:text-5xl",
+                  "font-[var(--font-display)] text-2xl font-light leading-[1.05] tracking-tight md:text-3xl lg:text-[1.9rem]",
                   "transition-[color,transform] duration-[var(--duration-base)] ease-[var(--ease-out-expo)]",
                   "group-hover/row:text-[var(--color-accent)] lg:group-hover/row:translate-x-1",
                 )}
               >
                 {row.name}
               </h3>
-              <p className="mt-1.5 hidden text-[12px] uppercase tracking-[0.22em] text-[var(--color-fg-muted)] md:block">
+              <p className="mt-1 hidden text-[11px] uppercase tracking-[0.22em] text-[var(--color-fg-muted)] md:block">
                 {row.descriptor}
               </p>
             </div>
 
             {/* Count */}
             <div className="text-right">
-              <p className="font-[var(--font-display)] text-xl font-light tabular-nums md:text-2xl">
+              <p className="font-[var(--font-display)] text-lg font-light tabular-nums md:text-xl">
                 {row.count}
               </p>
               <p className="mt-0.5 text-[10px] uppercase tracking-[0.22em] text-[var(--color-fg-subtle)]">
@@ -71,13 +71,13 @@ export function CatalogIndex({ rows }: CatalogIndexProps) {
             </div>
 
             {/* Arrow + image peek (lg only) */}
-            <div className="relative hidden h-14 w-14 items-center justify-end lg:flex">
+            <div className="relative hidden h-10 w-10 items-center justify-end lg:flex">
               {row.cover && (
                 <span
                   className={cn(
-                    "absolute right-16 top-1/2 hidden h-20 w-28 -translate-y-1/2 overflow-hidden rounded-sm border border-[var(--color-border)]",
+                    "absolute right-14 top-1/2 hidden h-14 w-20 -translate-y-1/2 overflow-hidden rounded-sm border border-[var(--color-border)]",
                     "opacity-0 transition-all duration-[var(--duration-base)] ease-[var(--ease-out-expo)]",
-                    "group-hover/row:translate-x-2 group-hover/row:opacity-100 xl:block",
+                    "group-hover/row:translate-x-1.5 group-hover/row:opacity-100 xl:block",
                   )}
                   aria-hidden
                 >
@@ -85,19 +85,19 @@ export function CatalogIndex({ rows }: CatalogIndexProps) {
                     src={row.cover}
                     alt=""
                     fill
-                    sizes="112px"
+                    sizes="80px"
                     className="object-cover"
                   />
                 </span>
               )}
               <span
                 className={cn(
-                  "inline-flex h-12 w-12 items-center justify-center rounded-full border border-[var(--color-border-strong)] text-[var(--color-fg-muted)]",
+                  "inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border-strong)] text-[var(--color-fg-muted)]",
                   "transition-[color,background-color,border-color,transform] duration-[var(--duration-base)] ease-[var(--ease-out-expo)]",
                   "group-hover/row:-translate-y-0.5 group-hover/row:border-[var(--color-fg)] group-hover/row:bg-[var(--color-fg)] group-hover/row:text-[var(--color-bg)]",
                 )}
               >
-                <ArrowUpRight className="h-4 w-4" />
+                <ArrowUpRight className="h-3.5 w-3.5" />
               </span>
             </div>
           </Link>
